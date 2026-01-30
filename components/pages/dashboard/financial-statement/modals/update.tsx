@@ -55,7 +55,7 @@ const UpdateFS = ({ getList, item, currentPage }: UpdateProps) => {
         if (success) {
             getList(currentPage)
              present({
-          message: 'Financial Statement successfully updated. ',
+          message: 'Record successfully updated. ',
           duration: 1000,
         });
           dismiss();
@@ -75,7 +75,7 @@ const UpdateFS = ({ getList, item, currentPage }: UpdateProps) => {
   return (
     <>
       <div className="text-start">
-        <IonButton fill="clear" id="update-fs-modal" 
+        <IonButton fill="clear" id={`update-fs-modal-${item._id}`} 
         
        className="space-x-1 rounded-md w-24 min-h-7 ![--padding-start:0] ![--padding-end:0] ![--padding-top:0] ![--padding-bottom:0] bg-blue-100 text-blue-900 capitalize text-xs"
         >
@@ -85,7 +85,7 @@ const UpdateFS = ({ getList, item, currentPage }: UpdateProps) => {
       </div>
       <IonModal
         ref={modal}
-        trigger="update-fs-modal"
+        trigger={`update-fs-modal-${item._id}`} 
         backdropDismiss={false}
         className=" [--border-radius:0.35rem] auto-height [--width:95%] [--max-width:32rem]"
       >

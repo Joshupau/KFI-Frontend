@@ -82,7 +82,7 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
         if (success) {
             getList(currentPage)
              present({
-          message: 'Financial Statement successfully updated. ',
+          message: 'Record successfully updated. ',
           duration: 1000,
         });
           dismiss();
@@ -130,7 +130,7 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
         modal.current?.dismiss();
     }
 
-    console.log('Prev', prevEntries)
+    console.log(form.formState.errors)
 
 
 
