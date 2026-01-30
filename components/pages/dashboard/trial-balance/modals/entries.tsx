@@ -77,7 +77,7 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
         if (success) {
             getList(currentPage)
              present({
-          message: 'Financial Statement successfully updated. ',
+          message: 'Record successfully updated. ',
           duration: 1000,
         });
           dismiss();
@@ -103,7 +103,7 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
              const formattedEntries = trialBalanceEntries.map((entry: any, index: number) => {
                 return {
                     _id: entry._id,
-                    line: index + 1,
+                    line: Number(index + 1),
                     financialStatement: entry.financialStatement,
                     acctCode: entry.acctCode,
                     acctCodeName: entry.acctCode,
@@ -125,14 +125,13 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
         modal.current?.dismiss();
     }
 
-    console.log('Prev', prevEntries)
 
 
 
   return (
     <>
       <div className="text-start">
-        <IonButton fill="clear" id="update-fs-entries" 
+        <IonButton fill="clear" id={`edit-tbentries-${item._id}`}
         
        className="space-x-1 rounded-md w-24 min-h-7 ![--padding-start:0] ![--padding-end:0] ![--padding-top:0] ![--padding-bottom:0] bg-purple-100 text-purple-900 capitalize text-xs"
         >
@@ -142,7 +141,7 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
       </div>
       <IonModal
         ref={modal}
-        trigger="update-fs-entries"
+        trigger={`edit-tbentries-${item._id}`}
         backdropDismiss={false}
         onWillPresent={getEntries}
         className=" [--border-radius:0.35rem] auto-height [--width:95%] [--max-width:64rem]"
@@ -153,7 +152,7 @@ const UpdateFSEntries = ({ getList, item, currentPage }: UpdateProps) => {
           </IonToolbar>
         </IonHeader> */}
         <div className="p-6 flex flex-col gap-6">
-           <ModalHeader disabled={loading} title="Financial Statement - Entries" sub="Manage financial data." dismiss={dismiss} />
+           <ModalHeader disabled={loading} title="Trial Balance - Entries" sub="Manage financial data." dismiss={dismiss} />
           <div>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FinancialStatementEntryForm form={form} loading={loading} />

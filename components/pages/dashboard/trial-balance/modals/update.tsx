@@ -72,7 +72,7 @@ const UpdateTB = ({ getList, item, currentPage }: UpdateProps) => {
   return (
     <>
       <div className="text-start">
-        <IonButton fill="clear" id="update-fs-modal" 
+        <IonButton fill="clear" id={`edit-tb-${item._id}`} 
         
        className="space-x-1 rounded-md w-24 min-h-7 ![--padding-start:0] ![--padding-end:0] ![--padding-top:0] ![--padding-bottom:0] bg-blue-100 text-blue-900 capitalize text-xs"
         >
@@ -82,7 +82,7 @@ const UpdateTB = ({ getList, item, currentPage }: UpdateProps) => {
       </div>
       <IonModal
         ref={modal}
-        trigger="update-fs-modal"
+        trigger={`edit-tb-${item._id}`}
         backdropDismiss={false}
         className=" [--border-radius:0.35rem] auto-height [--width:95%] [--max-width:32rem]"
       >
@@ -92,7 +92,7 @@ const UpdateTB = ({ getList, item, currentPage }: UpdateProps) => {
           </IonToolbar>
         </IonHeader> */}
         <div className="p-6 flex flex-col gap-6">
-           <ModalHeader disabled={loading} title="Financial Statement - Add Record" sub="Manage financial data." dismiss={dismiss} />
+           <ModalHeader disabled={loading} title="Trial Balance - Edit Record" sub="Manage financial data." dismiss={dismiss} />
           <div>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <TBForm form={form} loading={loading} />
