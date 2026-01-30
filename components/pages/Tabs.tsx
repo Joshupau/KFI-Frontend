@@ -80,6 +80,8 @@ import Databases from './dashboard/databases/databases';
 import { useOnlineStore } from '../../store/onlineStore';
 import Activity from './dashboard/activity/AuditTrail';
 import BeginningBalance from './dashboard/beginning-balance/BeginningBalance';
+import ProjectedCollections from './dashboard/projected-collection/ProjectedCollections';
+import PortfolioAtRisk from './dashboard/portfolio-at-risk/PortfolioatRisk';
 
 type NavLink = {
   path?: string;
@@ -134,6 +136,7 @@ const navLinks: NavLink[] = [
       { path: "/dashboard/financial-statement", label: "Financial Statement", resource: "financial statement" },
       { path: "/dashboard/trial-balance", label: "Trial Balance", resource: "trial balance" },
       { path: "/dashboard/beginning-balance", label: "Beginning Balance", resource: "beginning balance" },
+      { path: "/dashboard/projected-collection", label: "Projected Collection", resource: "projected collection" },
     ],
   },
 
@@ -432,6 +435,8 @@ const Tabs = () => {
             <Route path="/dashboard/financial-statement" render={() => <FinancialStatement />} exact={true} />
             <Route path="/dashboard/trial-balance" render={() => <TrialBalance />} exact={true} />
             <Route path="/dashboard/beginning-balance" render={() => <BeginningBalance />} exact={true} />
+            <Route path="/dashboard/projected-collection" render={() => <ProjectedCollections />} exact={true} />
+            <Route path="/dashboard/portfolio-at-risk" render={() => <PortfolioAtRisk />} exact={true} />
             <Route path="/dashboard/group-of-account" render={() => <GroupAccount />} exact={true} />
             <Route path="/dashboard/chart-of-account" render={() => <ChartOfAccount />} exact={true} />
             <Route path="/dashboard/product" render={() => <Loans />} exact={true} />

@@ -37,5 +37,24 @@ export const fsentriesschema = z.object({
  
 });
 
+
+export const financialstatementdocument = z.object({
+  type: z.string().nonempty('Select options'),
+  title: z.string().nonempty('Select options'),
+  month: z
+      .string()
+      .min(1, 'Account Month is required')
+      .max(255, 'Account Month must only consist of 255 characters')
+      .refine(value => !isNaN(Number(value)), 'Account Month must be a number')
+      .refine(value => !isNaN(Number(value)) && Number(value) >= 1 && Number(value) <= 12, 'Account month must be only 1 to 12'),
+    year: z
+      .string()
+      .min(1, 'Account Year is required')
+      .max(255, 'Account Year must only consist of 255 characters')
+      .refine(value => !isNaN(Number(value)), 'Account Year must be a number'),
+  
+});
+
 export type FSFormData = z.infer<typeof fschema>;
 export type FSEntriesFormData = z.infer<typeof fsentriesschema>;
+export type GenerateFSFormData = z.infer<typeof financialstatementdocument>;

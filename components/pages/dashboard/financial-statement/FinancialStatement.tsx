@@ -11,6 +11,7 @@ import { FinancialStatements } from '../../../../types/types';
 import UpdateFS from './modals/update';
 import DeleteFS from './modals/delete';
 import UpdateFSEntries from './modals/entries';
+import GenerateReport from './modals/generate-report';
 
 export type TFS = {
   financialStatements: FinancialStatements[];
@@ -71,6 +72,8 @@ const FinancialStatement = () => {
 
             <div className="flex items-center gap-2 flex-wrap">
               <CreateFS getList={getList} />
+
+              <GenerateReport/>
               
             </div>
            

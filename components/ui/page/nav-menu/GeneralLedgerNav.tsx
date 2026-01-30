@@ -22,6 +22,9 @@ const GeneralLedgerNav = () => {
     { path: '/dashboard/financial-statement', label: 'Financial Statement', resource: 'financial statement' },
     { path: '/dashboard/trial-balance', label: 'Trial Balance', resource: 'trial balance' },
     { path: '/dashboard/beginning-balance', label: 'Beginning Balance', resource: 'beginning balance' },
+    { path: "/dashboard/projected-collection", label: "Projected Collection", resource: "projected collection" },
+    { path: "/dashboard/portfolio-at-risk", label: "Portfolio at Risk", resource: "portfolio at risk" },
+
 
   ];
 
@@ -41,7 +44,7 @@ const GeneralLedgerNav = () => {
         General Ledgers&nbsp;
         <IonIcon icon={chevronDownOutline} className="text-xs" />
       </IonButton>
-      <IonPopover onDidDismiss={() => setIsOpen(false)} showBackdrop={false} trigger="general-ledgers" triggerAction="click" className="[--max-width:12rem]">
+      <IonPopover onDidDismiss={() => setIsOpen(false)} showBackdrop={false} trigger="general-ledgers" triggerAction="click" className="[--max-width:14rem]">
         <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
           {fileLinks.map(
             link =>

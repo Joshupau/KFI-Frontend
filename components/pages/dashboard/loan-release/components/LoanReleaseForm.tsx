@@ -135,7 +135,6 @@ const LoanReleaseForm = ({ form, loading = false }: TForm) => {
                 placeholder="Type here"
                 className="!p-2 rounded-md !text-[0.7rem]"
                 labelClassName="truncate min-w-[7.5rem] !text-[0.7rem]  !text-slate-600 text-end"
-                readOnly
               />
             </FormIonItem>
 
@@ -149,7 +148,6 @@ const LoanReleaseForm = ({ form, loading = false }: TForm) => {
                 placeholder="Type here"
                 className="!p-2 rounded-md !text-[0.7rem]"
                 labelClassName="truncate min-w-[7.5rem] !text-[0.7rem]  !text-slate-600 text-end"
-                readOnly
               />
             </FormIonItem>
           <FormIonItem className="w-full [--min-height:0]">

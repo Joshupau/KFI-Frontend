@@ -95,7 +95,7 @@ const Activity = () => {
             <div className="relative overflow-auto">
 
               <form onSubmit={form.handleSubmit(onSubmit)} className=' flex flex-col gap-2 bg-white p-4 w-full max-w-md rounded-md shadow-md'>
-                <p className=' text-lg !font-semibold'>Print</p>
+                <p className=' text-lg !font-semibold'>Generate Report</p>
                 <div className=' w-full flex flex-col gap-2 p-4 border border-zinc-200 rounded-md'>
                   <p className=' text-sm !font-semibold'>Date</p>
 
