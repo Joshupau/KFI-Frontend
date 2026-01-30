@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IonButton, IonModal, IonHeader, IonToolbar, useIonToast, IonIcon } from '@ionic/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,13 +41,11 @@ const Update = ({ getList, item, currentPage }: UpdateProps) => {
     resolver: zodResolver(begbalancechema),
     defaultValues: {
       memo: item.memo,
-      year: item.year,
       
     },
   });
 
   function dismiss() {
-    form.reset();
     modal.current?.dismiss();
   }
 
@@ -121,22 +119,28 @@ const Update = ({ getList, item, currentPage }: UpdateProps) => {
           
       };
 
-      console.log(form.formState.errors, form.watch('entries'))
+      useEffect(() => {
+        form.setValue('year', String(item.year))
+      },[item])
+
+      console.log('from bb')
+
 
   return (
     <>
       <div className="text-start">
-        <IonButton fill="clear" id="update-fs-modal" 
+        <IonButton fill="clear"  id={`edit-bb-modal-${item._id}`}
+        type='button'
         
        className="space-x-1 rounded-md w-24 min-h-7 ![--padding-start:0] ![--padding-end:0] ![--padding-top:0] ![--padding-bottom:0] bg-blue-100 text-blue-900 capitalize text-xs"
         >
         
-                 <IonIcon icon={createSharp} className="text-[1rem] mr-1" /> Edit
+          <IonIcon icon={createSharp} className="text-[1rem] mr-1" /> Edit
         </IonButton>
       </div>
       <IonModal
         ref={modal}
-        trigger="update-fs-modal"
+        trigger={`edit-bb-modal-${item._id}`}
         backdropDismiss={false}
         onWillPresent={getEntries}
 
@@ -148,7 +152,7 @@ const Update = ({ getList, item, currentPage }: UpdateProps) => {
           </IonToolbar>
         </IonHeader> */}
         <div className="p-6 flex flex-col gap-6">
-           <ModalHeader disabled={loading} title="Financial Statement - Add Record" sub="Manage financial data." dismiss={dismiss} />
+           <ModalHeader disabled={loading} title="Beggining Balance - Edit Record" sub="Manage beggining balance data." dismiss={dismiss} />
           <div>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <BegBalanceForm form={form} loading={loading} />

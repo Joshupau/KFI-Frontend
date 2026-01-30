@@ -20,7 +20,11 @@ credit: z
 });
 
 export const begbalancechema = z.object({
-  year: z.number().min(1, 'Year is required'),
+   year: z
+        .string()
+        .min(1, 'Account Year is required')
+        .max(255, 'Account Year must only consist of 255 characters')
+        .refine(value => !isNaN(Number(value)), 'Account Year must be a number'),
   memo: z.string().min(1, 'Memo is required'),
    entries: z.array(entries).min(1, 'Entries is required'),
    deletedIds: z.array(z.string()).optional()

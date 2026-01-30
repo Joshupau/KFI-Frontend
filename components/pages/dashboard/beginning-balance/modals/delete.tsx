@@ -54,7 +54,7 @@ const Delete = ({item,getList,currentPage }: DeleteNatureProps) => {
     <>
       
         <IonButton
-               id={`delete-fs-modal-${item._id}`}
+               id={`delete-bb-modal-${item._id}`}
                type="button"
                fill="clear"
                className="space-x-1 rounded-md w-24 min-h-7 ![--padding-start:0] ![--padding-end:0] ![--padding-top:0] ![--padding-bottom:0] bg-red-100 text-red-900 capitalize text-xs"
@@ -63,7 +63,7 @@ const Delete = ({item,getList,currentPage }: DeleteNatureProps) => {
              </IonButton>
       <IonModal
         ref={modal}
-        trigger={`delete-fs-modal-${item._id}`}
+        trigger={`delete-bb-modal-${item._id}`}
         backdropDismiss={false}
         className=" [--border-radius:0.35rem] auto-height [--width:95%] [--max-width:32rem]"
       >

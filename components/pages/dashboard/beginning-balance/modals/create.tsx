@@ -71,6 +71,12 @@ const Create = ({ getList }: CreateProps) => {
         const errors: TFormError[] | string = checkError(errs);
         const fields: string[] = Object.keys(form.formState.defaultValues as Object);
         formErrorHandler(errors, form.setError, fields);
+          present({
+           message: error.response.data.error.formErrors[0].msgs,
+           duration: 1200,
+         });
+
+        console.log(error)
       } finally {
         setLoading(false);
       }
@@ -80,13 +86,13 @@ const Create = ({ getList }: CreateProps) => {
   return (
     <>
       <div className="text-end">
-        <IonButton fill="clear" id="create-tb-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
+        <IonButton fill="clear" id="create-bb-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
           + Add
         </IonButton>
       </div>
       <IonModal
         ref={modal}
-        trigger="create-tb-modal"
+        trigger="create-bb-modal"
         backdropDismiss={false}
         className=" [--border-radius:0.35rem] auto-height [--width:95%] [--max-width:64rem]"
       >
@@ -96,7 +102,7 @@ const Create = ({ getList }: CreateProps) => {
           </IonToolbar>
         </IonHeader> */}
         <div className="p-6 flex flex-col gap-6">
-           <ModalHeader disabled={loading} title="Trial Balance - Add Record" sub="Manage trial balance data." dismiss={dismiss} />
+           <ModalHeader disabled={loading} title="Beggining Balance - Add Record" sub="Manage trial balance data." dismiss={dismiss} />
           <div>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <BegBalanceForm form={form} loading={loading} />
