@@ -8,14 +8,12 @@ export const entries = z.object({
     acctCodeDescription: z.string().optional(),
   debit: z
       .string()
-      .min(1, 'Debit is required')
-      .max(255, 'Debit must only consist of 255 characters')
-      .refine(value => !isNaN(Number(value.replace(',', '').replace('.', ''))), 'Debit must be a number'),
+      .refine(value => value !== undefined && value !== null && value !== '', 'Debit is required')
+      .refine(value => !isNaN(Number(value.replace(/,/g, ''))), 'Debit must be a number'),
 credit: z
     .string()
-    .min(1, 'Credit is required')
-    .max(255, 'Credit must only consist of 255 characters')
-    .refine(value => !isNaN(Number(value.replace(',', '').replace('.', ''))), 'Credit must be a number'),
+    .refine(value => value !== undefined && value !== null && value !== '', 'Credit is required')
+    .refine(value => !isNaN(Number(value.replace(/,/g, ''))), 'Credit must be a number'),
  
 });
 

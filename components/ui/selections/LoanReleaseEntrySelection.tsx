@@ -100,7 +100,7 @@ const LoanReleaseEntrySelection = <T extends FieldValues>({
 
   const handleSelectExpenseVoucher = (loanEntry: Option) => {
     setValue(loanReleaseEntryId as Path<T>, loanEntry._id as PathValue<T, Path<T>> as any);
-    setValue(cvNo as Path<T>, `CV#${loanEntry.cvNo}` as PathValue<T, Path<T>> as any);
+    setValue(cvNo as Path<T>, `${loanEntry.cvNo}` as PathValue<T, Path<T>> as any);
     setValue(dueDate as Path<T>, formatDateTable(loanEntry.dueDate) as PathValue<T, Path<T>> as any);
     setValue(noOfWeeks as Path<T>, `${loanEntry.noOfWeeks}` as PathValue<T, Path<T>> as any);
     setValue(name as Path<T>, loanEntry.name as PathValue<T, Path<T>> as any);

@@ -18,12 +18,12 @@ const GeneralLedgerNav = () => {
   const fileLinks: NavLink[] = [
     { path: '/dashboard/audit-trail', label: 'Audit Trail', resource: 'audit trail' },
     { path: '/dashboard/activity', label: 'Activity', resource: 'activity' },
-
     { path: '/dashboard/financial-statement', label: 'Financial Statement', resource: 'financial statement' },
     { path: '/dashboard/trial-balance', label: 'Trial Balance', resource: 'trial balance' },
     { path: '/dashboard/beginning-balance', label: 'Beginning Balance', resource: 'beginning balance' },
     { path: "/dashboard/projected-collection", label: "Projected Collection", resource: "projected collection" },
     { path: "/dashboard/portfolio-at-risk", label: "Portfolio at Risk", resource: "portfolio at risk" },
+    { path: '/dashboard/weekly-collection', label: 'Weekly Collection', resource: 'weekly collection' },
 
 
   ];

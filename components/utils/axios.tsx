@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestCo
 const kfiAxios: AxiosInstance = axios.create({
   // baseURL: 'http://localhost:5005/api/v1',
 
-  baseURL: 'https://kfiapi.axcela-ph.com/api/v1',
+  baseURL: 'http://localhost:5005/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },

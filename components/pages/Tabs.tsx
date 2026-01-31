@@ -80,8 +80,9 @@ import Databases from './dashboard/databases/databases';
 import { useOnlineStore } from '../../store/onlineStore';
 import Activity from './dashboard/activity/AuditTrail';
 import BeginningBalance from './dashboard/beginning-balance/BeginningBalance';
-import ProjectedCollections from './dashboard/projected-collection/ProjectedCollections';
-import PortfolioAtRisk from './dashboard/portfolio-at-risk/PortfolioatRisk';
+import WeeklyCollection from './dashboard/weekly-collection/WeeklyCollection';
+import ProjectedCollection from './dashboard/projected-collection/ProjectedCollection';
+import PortfolioAtRisk from './dashboard/portfolio-at-risk/PortfolioAtRisk';
 
 type NavLink = {
   path?: string;
@@ -128,7 +129,7 @@ const navLinks: NavLink[] = [
   { path: "/dashboard/nature", label: "Nature", resource: "nature", icon: <ListViewIcon size={18} /> },
   {
     label: "General Ledgers",
-    resource: ["audit trail","activity", "financial statement", "trial balance"],
+    resource: ["audit trail","activity", "financial statement", "trial balance", "weekly collection", "projected collection", "portfolio at risk"],
     icon: < CollectionsBookmarkIcon size={18} />,
     children: [
       { path: "/dashboard/audit-trail", label: "Audit Trail", resource: "audit trail" },
@@ -136,7 +137,9 @@ const navLinks: NavLink[] = [
       { path: "/dashboard/financial-statement", label: "Financial Statement", resource: "financial statement" },
       { path: "/dashboard/trial-balance", label: "Trial Balance", resource: "trial balance" },
       { path: "/dashboard/beginning-balance", label: "Beginning Balance", resource: "beginning balance" },
+      { path: "/dashboard/weekly-collection", label: "Weekly Collection", resource: "weekly collection" },
       { path: "/dashboard/projected-collection", label: "Projected Collection", resource: "projected collection" },
+      { path: "/dashboard/portfolio-at-risk", label: "Portfolio at Risk", resource: "portfolio at risk" },
     ],
   },
 
@@ -194,7 +197,6 @@ const Tabs = () => {
 
   const online = useOnlineStore((state) => state.online);
   
-
 
   const logout = () => {
     localStorage.removeItem('auth');
@@ -435,7 +437,8 @@ const Tabs = () => {
             <Route path="/dashboard/financial-statement" render={() => <FinancialStatement />} exact={true} />
             <Route path="/dashboard/trial-balance" render={() => <TrialBalance />} exact={true} />
             <Route path="/dashboard/beginning-balance" render={() => <BeginningBalance />} exact={true} />
-            <Route path="/dashboard/projected-collection" render={() => <ProjectedCollections />} exact={true} />
+            <Route path="/dashboard/weekly-collection" render={() => <WeeklyCollection />} exact={true} />
+            <Route path="/dashboard/projected-collection" render={() => <ProjectedCollection />} exact={true} />
             <Route path="/dashboard/portfolio-at-risk" render={() => <PortfolioAtRisk />} exact={true} />
             <Route path="/dashboard/group-of-account" render={() => <GroupAccount />} exact={true} />
             <Route path="/dashboard/chart-of-account" render={() => <ChartOfAccount />} exact={true} />
