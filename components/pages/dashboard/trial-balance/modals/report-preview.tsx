@@ -65,7 +65,7 @@ const ReportPreview = ({ trialBalances = [] }: ReportPreviewProps) => {
 
     try {
       if (data.type === 'print') {
-        const result = await kfiAxios.post('/trial-balance/print-report', requestData, {
+        const result = await kfiAxios.post('/transaction/print/trial-balance', requestData, {
           responseType: 'blob',
         });
 
@@ -76,7 +76,7 @@ const ReportPreview = ({ trialBalances = [] }: ReportPreviewProps) => {
 
         setLoading(false);
       } else if (data.type === 'export') {
-        const result = await kfiAxios.post('/trial-balance/export-report', requestData, {
+        const result = await kfiAxios.post('/transaction/export/trial-balance', requestData, {
           responseType: 'blob',
         });
 
