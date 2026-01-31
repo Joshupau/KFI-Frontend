@@ -33,9 +33,6 @@ export async function generateStaticParams() {
     { all: ['dashboard', 'financial-statement'] },
     { all: ['dashboard', 'trial-balance'] },
     { all: ['dashboard', 'beginning-balance'] },
-    { all: ['dashboard', 'projected-collection'] },
-    // { all: ['dashboard', 'portfolio-at-risk'] },
-
     { all: ['dashboard', 'weekly-collection'] },
     { all: ['dashboard', 'projected-collection'] },
     { all: ['dashboard', 'portfolio-at-risk'] },
