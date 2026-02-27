@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageTitle from '../../../ui/page/PageTitle';
 import AcknowledgementFilter from './components/AcknowledgementFilter';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
@@ -32,8 +32,7 @@ export type TData = {
 };
 
 const Acknowledgement = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
-
+  const [token, setToken] = useState<AccessToken | null>(null);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -51,6 +50,18 @@ const Acknowledgement = () => {
     nextPage: false,
     prevPage: false,
   });
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
 
   const getAcknowledgements = async (page: number, keyword: string = '', sort: string = '', to: string = '', from: string = '') => {
    if(online){
@@ -171,9 +182,9 @@ const Acknowledgement = () => {
 
               <div className="  flex flex-col gap-4 flex-wrap">
                 <div className="flex items-start flex-wrap">
-                  <div>{canDoAction(token.role, token.permissions, 'acknowledgement', 'create') && <CreateAcknowledgement getAcknowledgements={getAcknowledgements} />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'acknowledgement', 'print') && <PrintAllAcknowledgement />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'acknowledgement', 'export') && <ExportAllAcknowledgement />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'acknowledgement', 'create') && <CreateAcknowledgement getAcknowledgements={getAcknowledgements} />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'acknowledgement', 'print') && <PrintAllAcknowledgement />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'acknowledgement', 'export') && <ExportAllAcknowledgement />}</div>
                   {online && (
                     <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                       <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -195,7 +206,7 @@ const Acknowledgement = () => {
                       <TableHead>CHK. No.</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Encoded By</TableHead>
-                      {haveActions(token.role, 'acknowledgement', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
+                      {token && haveActions(token.role, 'acknowledgement', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -211,7 +222,7 @@ const Acknowledgement = () => {
                           <TableCell>{acknowledgement.checkNo}</TableCell>
                           <TableCell>{formatMoney(acknowledgement.amount)}</TableCell>
                           <TableCell>{acknowledgement.encodedBy.username}</TableCell>
-                          {haveActions(token.role, 'acknowledgement', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
+                          {token && haveActions(token.role, 'acknowledgement', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
                             <TableCell>
                               <AcknowledgementActions
                                 acknowledgement={acknowledgement}

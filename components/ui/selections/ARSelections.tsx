@@ -68,11 +68,14 @@ const ARSelection = <T extends FieldValues>({
     setIsOpen(true);
   };
 
-  const handleSearch = async (page: number) => {
+  const handleSearch = async (page: number, dueDateOverride?: string) => {
     const value = ionInputRef.current?.value || '';
+    const usedDueDate = dueDateOverride ?? dueDateId;
     setData(prev => ({ ...prev, loading: true }));
     try {
-      const filter: any = { dueDateId: dueDateId, type: type, category: category};
+      const filter: any = { type: type, category: category };
+      if (usedDueDate) filter.dueDateId = usedDueDate;
+      else filter.dueDate = new Date().toISOString().split('T')[0];
       const result = await kfiAxios.get('/release/load-entries', { params: filter });
       const { success, acknowledgements, hasPrevPage, hasNextPage, totalPages } = result.data;
       if (success) {
@@ -100,6 +103,22 @@ const ARSelection = <T extends FieldValues>({
         const { success, dueDates } = result.data;
 
         setDuedates(dueDates)
+
+        // default to today's due date when available
+        try {
+          const parsed = dueDates || [];
+          const todayISO = new Date().toISOString().split('T')[0];
+          const match = parsed.find((item: any) => {
+            const d = item.dueDate || item.duedate;
+            if (!d) return false;
+            const iso = new Date(d).toISOString().split('T')[0];
+            return iso === todayISO;
+          });
+            const selectedId = match ? (match.id || match._id || match.id?.toString() || '') : '';
+            if (selectedId) setDueDateId(selectedId);
+            // trigger search using the selected id immediately
+            if (selectedId) handleSearch(1, selectedId);
+        } catch (e) {}
      
       } catch (error) {
       } finally {
@@ -112,10 +131,15 @@ const ARSelection = <T extends FieldValues>({
     const code = acknowledgement.code as PathValue<T, Path<T>>;
     const id = acknowledgement._id as PathValue<T, Path<T>>;
 
-    setValue(acknowledgementLabel as Path<T>, code as any);
-    setValue(acknowledgementValue as Path<T>, id as any);
-    clearErrors(acknowledgementLabel);
-    clearErrors(acknowledgementValue);
+    if (acknowledgementLabel) {
+      setValue(acknowledgementLabel as Path<T>, code as any);
+      clearErrors(acknowledgementLabel);
+    }
+
+    if (acknowledgementValue) {
+      setValue(acknowledgementValue as Path<T>, id as any);
+      clearErrors(acknowledgementValue);
+    }
     setData({
       acknowledgements: [],
       loading: false,
@@ -129,7 +153,7 @@ const ARSelection = <T extends FieldValues>({
   const handlePagination = (page: number) => handleSearch(page);
 
   useEffect(() => {
-    if (isOpen) handlePagination(1), handleDueDates();
+    if (isOpen) handleDueDates();
   }, [isOpen]);
 
   return (
@@ -183,8 +207,8 @@ const ARSelection = <T extends FieldValues>({
                     )}
                     >
                       {duedates.map((item, index) => (
-                        <IonSelectOption key={index}  value={item.id} className="text-xs [--min-height:0.5rem]">
-                          {item.duedate}
+                        <IonSelectOption key={index}  value={item._id || item.id} className="text-xs [--min-height:0.5rem]">
+                          {item.date || item.date}
                         </IonSelectOption>
                       ))}
                         
@@ -214,6 +238,12 @@ const ARSelection = <T extends FieldValues>({
                           </IonSelectOption>
                           <IonSelectOption  value={'individual'} className="text-xs [--min-height:0.5rem]">
                             Individual
+                          </IonSelectOption>
+                          <IonSelectOption  value={'educational'} className="text-xs [--min-height:0.5rem]">
+                            Educational
+                          </IonSelectOption>
+                          <IonSelectOption  value={'other'} className="text-xs [--min-height:0.5rem]">
+                            Other
                           </IonSelectOption>
                     </IonSelect>
                   </FormIonItem>

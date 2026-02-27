@@ -1,14 +1,29 @@
 import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel, IonList, IonMenuToggle } from '@ionic/react';
 import { documentAttachOutline } from 'ionicons/icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AccessToken, NavLink, Permission } from '../../../types/types';
 import { usePathname } from 'next/navigation';
 import classNames from 'classnames';
 import { jwtDecode } from 'jwt-decode';
 
 const GeneralLedgerNav = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const fileLinks: NavLink[] = [
     { path: '/dashboard/audit-trail', label: 'Audit Trail', resource: 'audit trail' },

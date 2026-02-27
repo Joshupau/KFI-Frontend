@@ -1,14 +1,29 @@
 import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel, IonList, IonMenuToggle } from '@ionic/react';
 import { fileTrayFullOutline } from 'ionicons/icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AccessToken, NavLink, Permission } from '../../../types/types';
 import { usePathname } from 'next/navigation';
 import classNames from 'classnames';
 import { jwtDecode } from 'jwt-decode';
 
 const TransactionNavigation = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const fileLinks: NavLink[] = [
     { path: '/dashboard/loan-release', label: 'Loan Release', resource: 'loan release' },
@@ -60,7 +75,7 @@ const TransactionNavigation = () => {
         <IonList className="p-0">
           {fileLinks.map(
             (link, i) =>
-              (token.role === 'superadmin' || token.permissions.find((e: Permission) => link.resource.includes(e.resource) && e.actions.visible)) &&
+              (token && (token.role === 'superadmin' || token.permissions.find((e: Permission) => link.resource.includes(e.resource) && e.actions.visible))) &&
               (link.children ? (
                 <IonAccordionGroup key={`transaction-link-${i}`}>
                   <IonAccordion value={link.label} className="bg-transparent">
@@ -77,7 +92,7 @@ const TransactionNavigation = () => {
                       <IonList className="p-0">
                         {link.children.map(
                           subLink =>
-                            (token.role === 'superadmin' || token.permissions.find((e: Permission) => e.resource === subLink.resource && e.actions.visible)) && (
+                            (token && (token.role === 'superadmin' || token.permissions.find((e: Permission) => e.resource === subLink.resource && e.actions.visible))) && (
                               <IonMenuToggle key={subLink.path} autoHide={false}>
                                 <IonItem
                                   routerLink={subLink.path}

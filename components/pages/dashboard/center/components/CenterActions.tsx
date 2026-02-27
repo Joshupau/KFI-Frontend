@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { ellipsisVertical } from 'ionicons/icons';
 import UpdateCenter from '../modals/UpdateCenter';
@@ -22,12 +22,27 @@ type CenterActionsProps = {
 };
 
 const CenterActions = ({ center, setData, getCenters, currentPage, setCurrentPage, searchKey, sortKey, rowLength }: CenterActionsProps) => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
+
+  if (!token) return null;
+
   return (
     <div>
-      {canDoAction(token.role, token.permissions, 'center', 'visible') && <ViewCenter center={center} />}
-      {canDoAction(token.role, token.permissions, 'center', 'update') && <UpdateCenter center={center} setData={setData} />}
-      {canDoAction(token.role, token.permissions, 'center', 'delete') && (
+      {token && canDoAction(token.role, token.permissions, 'center', 'visible') && <ViewCenter center={center} />}
+      {token && canDoAction(token.role, token.permissions, 'center', 'update') && <UpdateCenter center={center} setData={setData} />}
+      {token && canDoAction(token.role, token.permissions, 'center', 'delete') && (
         <DeleteCenter center={center} getCenters={getCenters} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
     </div>
@@ -37,8 +52,8 @@ const CenterActions = ({ center, setData, getCenters, currentPage, setCurrentPag
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`center-${center._id}`} triggerAction="click" className="[--max-width:10rem]">
     //     <IonContent>
-    //       {canDoAction(token.role, token.permissions, 'center', 'update') && <UpdateCenter center={center} setData={setData} />}
-    //       {canDoAction(token.role, token.permissions, 'center', 'delete') && (
+    //       {token && canDoAction(token.role, token.permissions, 'center', 'update') && <UpdateCenter center={center} setData={setData} />}
+    //       {token && canDoAction(token.role, token.permissions, 'center', 'delete') && (
     //         <DeleteCenter center={center} getCenters={getCenters} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
     //       )}
     //     </IonContent>

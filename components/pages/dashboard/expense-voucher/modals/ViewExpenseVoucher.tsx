@@ -68,7 +68,7 @@ const ViewExpenseVoucher = ({ expenseVoucher }: ViewExpenseVoucherType) => {
               <div className="space-y-1">
                 <ExpenseVoucherViewCard label="Check Number" value={expenseVoucher.checkNo} labelClassName=" text-xs" />
                 <ExpenseVoucherViewCard label="Check Date" value={formatDateTable(expenseVoucher.checkDate)} labelClassName=" text-xs" />
-                <ExpenseVoucherViewCard label="Bank Code" value={expenseVoucher.bankCode.code} labelClassName=" text-xs" />
+                <ExpenseVoucherViewCard label="Bank Code" value={expenseVoucher.bank.code} labelClassName=" text-xs" />
                 <ExpenseVoucherViewCard label="Amount" value={`${formatNumber(expenseVoucher.amount)}`} labelClassName=" text-xs" />
               </div>
             </div>

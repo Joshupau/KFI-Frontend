@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ellipsisVertical, fileTrayFullOutline, fileTrayFullSharp, print } from 'ionicons/icons';
 import UpdateLoanRelease from '../modals/UpdateLoanRelease';
 import DeleteLoanRelease from '../modals/DeleteLoanRelease';
@@ -26,17 +26,31 @@ type LoanReleaseActionsProps = {
 };
 
 const LoanReleaseActions = ({ transaction, setData, getTransactions, searchKey, sortKey, currentPage, rowLength }: LoanReleaseActionsProps) => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
+
+  if (!token) return null;
 
   return (
     <div className="flex items-center gap-1">
       <ViewLoanRelease transaction={transaction} />
-      {canDoAction(token.role, token.permissions, 'loan release', 'update') && <UpdateLoanRelease transaction={transaction} setData={setData} />}
-      {canDoAction(token.role, token.permissions, 'loan release', 'delete') && (
+      {token && canDoAction(token.role, token.permissions, 'loan release', 'update') && <UpdateLoanRelease transaction={transaction} setData={setData} />}
+      {token && canDoAction(token.role, token.permissions, 'loan release', 'delete') && (
         <DeleteLoanRelease transaction={transaction} getTransactions={getTransactions} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
-      {canDoAction(token.role, token.permissions, 'loan release', 'print') && <PrintLoanRelease transaction={transaction} />}
-      {canDoAction(token.role, token.permissions, 'loan release', 'export') && <ExportLoanRelease transaction={transaction} />}
+      {token && canDoAction(token.role, token.permissions, 'loan release', 'print') && <PrintLoanRelease transaction={transaction} />}
+      {token && canDoAction(token.role, token.permissions, 'loan release', 'export') && <ExportLoanRelease transaction={transaction} />}
     </div>
     // <>
     //   <IonButton fill="clear" id={`loanRelease-${transaction._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
@@ -45,8 +59,8 @@ const LoanReleaseActions = ({ transaction, setData, getTransactions, searchKey, 
     //   <IonPopover showBackdrop={false} trigger={`loanRelease-${transaction._id}`} triggerAction="click" className="[--max-width:11rem]">
     //     <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
     //       <ViewLoanRelease transaction={transaction} />
-    // {canDoAction(token.role, token.permissions, 'loan release', 'update') && <UpdateLoanRelease transaction={transaction} setData={setData} />}
-    // {canDoAction(token.role, token.permissions, 'loan release', 'delete') && (
+    // {token && canDoAction(token.role, token.permissions, 'loan release', 'update') && <UpdateLoanRelease transaction={transaction} setData={setData} />}
+    // {token && canDoAction(token.role, token.permissions, 'loan release', 'delete') && (
     //   <DeleteLoanRelease
     //     transaction={transaction}
     //     getTransactions={getTransactions}
@@ -56,8 +70,8 @@ const LoanReleaseActions = ({ transaction, setData, getTransactions, searchKey, 
     //     rowLength={rowLength}
     //   />
     // )}
-    // {canDoAction(token.role, token.permissions, 'loan release', 'print') && <PrintLoanRelease transaction={transaction} />}
-    // {canDoAction(token.role, token.permissions, 'loan release', 'export') && <ExportLoanRelease transaction={transaction} />}
+    // {token && canDoAction(token.role, token.permissions, 'loan release', 'print') && <PrintLoanRelease transaction={transaction} />}
+    // {token && canDoAction(token.role, token.permissions, 'loan release', 'export') && <ExportLoanRelease transaction={transaction} />}
 
     //       {/* <UpdateCVLoanRelease transaction={index} /> */}
     //     </IonContent>

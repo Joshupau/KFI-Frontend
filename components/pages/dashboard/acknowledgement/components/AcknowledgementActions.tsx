@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ellipsisVertical, print } from 'ionicons/icons';
 import { AccessToken, Acknowledgement, ExpenseVoucher } from '../../../../../types/types';
 import { canDoAction } from '../../../../utils/permissions';
@@ -36,13 +36,27 @@ const AcknowledgementActions = ({
   from,
   rowLength,
 }: AcknowledgementActionsProps) => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
+
+  if (!token) return null;
 
   return (
     <div>
-      {canDoAction(token.role, token.permissions, 'acknowledgement', 'visible') && <ViewAcknowledgement acknowledgement={acknowledgement} />}
-      {canDoAction(token.role, token.permissions, 'acknowledgement', 'update') && <UpdateAcknowledgement acknowledgement={acknowledgement} setData={setData} getAcknowledgement={getAcknowledgements} currentPage={currentPage} />}
-      {canDoAction(token.role, token.permissions, 'acknowledgement', 'delete') && (
+      {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'visible') && <ViewAcknowledgement acknowledgement={acknowledgement} />}
+      {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'update') && <UpdateAcknowledgement acknowledgement={acknowledgement} setData={setData} getAcknowledgement={getAcknowledgements} currentPage={currentPage} />}
+      {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'delete') && (
         <DeleteAcknowledgement
           acknowledgement={acknowledgement}
           getAcknowledgements={getAcknowledgements}
@@ -52,8 +66,8 @@ const AcknowledgementActions = ({
           rowLength={rowLength}
         />
       )}
-      {canDoAction(token.role, token.permissions, 'acknowledgement', 'print') && <PrintAcknowledgement acknowledgement={acknowledgement} />}
-      {canDoAction(token.role, token.permissions, 'acknowledgement', 'export') && <ExportAcknowledgement acknowledgement={acknowledgement} />}
+      {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'print') && <PrintAcknowledgement acknowledgement={acknowledgement} />}
+      {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'export') && <ExportAcknowledgement acknowledgement={acknowledgement} />}
     </div>
     // <>
     //   <IonButton fill="clear" id={`acknowledgement-${acknowledgement._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
@@ -61,9 +75,9 @@ const AcknowledgementActions = ({
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`acknowledgement-${acknowledgement._id}`} triggerAction="click" className="[--max-width:11rem]">
     //     <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
-    //       {canDoAction(token.role, token.permissions, 'acknowledgement', 'visible') && <ViewAcknowledgement acknowledgement={acknowledgement} />}
-    //       {canDoAction(token.role, token.permissions, 'acknowledgement', 'update') && <UpdateAcknowledgement acknowledgement={acknowledgement} setData={setData} />}
-    //       {canDoAction(token.role, token.permissions, 'acknowledgement', 'delete') && (
+    //       {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'visible') && <ViewAcknowledgement acknowledgement={acknowledgement} />}
+    //       {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'update') && <UpdateAcknowledgement acknowledgement={acknowledgement} setData={setData} />}
+    //       {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'delete') && (
     //         <DeleteAcknowledgement
     //           acknowledgement={acknowledgement}
     //           getAcknowledgements={getAcknowledgements}
@@ -73,8 +87,8 @@ const AcknowledgementActions = ({
     //           rowLength={rowLength}
     //         />
     //       )}
-    //       {canDoAction(token.role, token.permissions, 'acknowledgement', 'print') && <PrintAcknowledgement acknowledgement={acknowledgement} />}
-    //       {canDoAction(token.role, token.permissions, 'acknowledgement', 'export') && <ExportAcknowledgement acknowledgement={acknowledgement} />}
+    //       {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'print') && <PrintAcknowledgement acknowledgement={acknowledgement} />}
+    //       {token && canDoAction(token.role, token.permissions, 'acknowledgement', 'export') && <ExportAcknowledgement acknowledgement={acknowledgement} />}
     //       {/* <UpdateCVExpenseVoucher index={index} /> */}
     //     </IonContent>
     //   </IonPopover>

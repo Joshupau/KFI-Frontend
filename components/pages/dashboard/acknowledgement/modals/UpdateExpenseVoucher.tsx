@@ -76,8 +76,8 @@ const UpdateAcknowledgement = ({ acknowledgement, setData, currentPage, getAckno
         checkNo: acknowledgement.checkNo,
         checkDate: formatDateInput(acknowledgement.checkDate),
         type: acknowledgement.type,
-        bankCode: acknowledgement.bankCode._id,
-        bankCodeLabel: `${acknowledgement.bankCode.code}`,
+        bankCode: acknowledgement.bank._id,
+        bankCodeLabel: `${acknowledgement.bank.code}`,
         amount: `${formatAmount(acknowledgement.amount)}`,
         cashCollection: `${acknowledgement.cashCollectionAmount || 0}`,
         mode: 'update',
@@ -114,21 +114,35 @@ function removeCVTag(cv: string): string {
 
         const formattedEntries = entries.map((entry, index) => {
           const isExisting = prevIds.has(entry._id);
+          
+          // Get loanReleaseId (ObjectId)
+          const loanReleaseId = typeof entry.loanReleaseEntryId === 'string' 
+            ? entry.loanReleaseEntryId 
+            : entry.loanReleaseEntryId?._id || '';
+          
+          // Get client ID (ObjectId)
+          const clientId = typeof entry.loanReleaseEntryId?.client === 'string'
+            ? entry.loanReleaseEntryId.client
+            : entry.loanReleaseEntryId?.client?._id || '';
+          
+          // Format dueDate to YYYY-MM-DD (no time)
+          const dueDate = entry.loanReleaseEntryId?.transaction?.dueDate 
+            ? formatDateInput(entry.loanReleaseEntryId.transaction.dueDate)
+            : formatDateInput(acknowledgement.date);
+          
           return {
               _id: isExisting ? entry._id : undefined,
-              loanReleaseEntryId: entry.loanReleaseEntryId._id,
-              cvNo: normalizeCVNumber(entry.cvNo),
-              dueDate: acknowledgement.date,
-              noOfWeeks: entry.loanReleaseEntryId.transaction.noOfWeeks,
-              name: entry.loanReleaseEntryId.client.name,
-              particular: entry.particular,
-              acctCodeId: entry.acctCode._id,
-              acctCode: entry.acctCode.code ?? '',
-              description: entry.acctCode.description ?? '',
-              debit: entry.debit?.toString() ?? "",
-              credit: entry.credit?.toString() ?? "",
               line: index + 1,
-            
+              week: entry.loanReleaseEntryId?.transaction?.noOfWeeks || 0,
+              loanReleaseId: loanReleaseId,
+              cvNo: normalizeCVNumber(entry.cvNo),
+              dueDate: dueDate,
+              client: clientId,
+              name: entry.loanReleaseEntryId?.client?.name || '',
+              acctCodeId: entry.acctCode?._id || '',
+              acctCode: entry.acctCode?.code || '',
+              debit: entry.debit?.toString() || "0",
+              credit: entry.credit?.toString() || "0",
           };
         });
         data.amount = removeAmountComma(data.amount);

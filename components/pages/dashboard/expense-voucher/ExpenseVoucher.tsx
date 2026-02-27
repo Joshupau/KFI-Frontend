@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateExpenseVoucher from './modals/CreateExpenseVoucher';
 import ExpenseVoucherFilter from './components/ExpenseVoucherFilter';
@@ -32,7 +32,7 @@ export type TData = {
 };
 
 const ExpenseVoucher = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
 
   const [present] = useIonToast();
 
@@ -51,6 +51,21 @@ const ExpenseVoucher = () => {
     nextPage: false,
     prevPage: false,
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const getExpenseVouchers = async (page: number, keyword: string = '', sort: string = '', to: string = '', from: string = '') => {
     if(online){
@@ -177,9 +192,9 @@ const ExpenseVoucher = () => {
                <div className=" flex flex-col gap-4 flex-wrap">
               
                 <div className="flex items-start flex-wrap w-fit">
-                  <div>{canDoAction(token.role, token.permissions, 'expense voucher', 'create') && <CreateExpenseVoucher getExpenseVouchers={getExpenseVouchers} />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'expense voucher', 'print') && <PrintAllExpenseVoucher />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportAllExpenseVoucher />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'expense voucher', 'create') && <CreateExpenseVoucher getExpenseVouchers={getExpenseVouchers} />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'expense voucher', 'print') && <PrintAllExpenseVoucher />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportAllExpenseVoucher />}</div>
                   {online && (
                     <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                       <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -201,7 +216,7 @@ const ExpenseVoucher = () => {
                       <TableHead>CHK. No.</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Encoded By</TableHead>
-                      {haveActions(token.role, 'expense voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
+                      {token && haveActions(token.role, 'expense voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -212,11 +227,11 @@ const ExpenseVoucher = () => {
                         <TableRow key={expenseVoucher._id}>
                           <TableCell>{expenseVoucher.code}</TableCell>
                           <TableCell>{formatDateTable(expenseVoucher.date)}</TableCell>
-                          <TableCell>{expenseVoucher.bankCode.description}</TableCell>
+                          <TableCell>{expenseVoucher.bank.description}</TableCell>
                           <TableCell>{expenseVoucher.checkNo}</TableCell>
                           <TableCell>{formatNumber(expenseVoucher.amount)}</TableCell>
                           <TableCell>{expenseVoucher.encodedBy.username}</TableCell>
-                          {haveActions(token.role, 'expense voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
+                          {token && haveActions(token.role, 'expense voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
                             <TableCell>
                               <ExpenseVoucherActions
                                 expenseVoucher={expenseVoucher}

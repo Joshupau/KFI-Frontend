@@ -27,8 +27,7 @@ type UpdateClientMasterFileProps = {
 const UpdateClientMasterFile = ({ client, setData, getClientsOffline }: UpdateClientMasterFileProps) => {
   const [loading, setLoading] = useState(false);
   const [present] = useIonToast();
-
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
 
   const modal = useRef<HTMLIonModalElement>(null);
   const online = useOnlineStore((state) => state.online);
@@ -66,6 +65,18 @@ const UpdateClientMasterFile = ({ client, setData, getClientsOffline }: UpdateCl
       clientImage: client.image?.path
     },
   });
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (client) {
@@ -208,7 +219,7 @@ const UpdateClientMasterFile = ({ client, setData, getClientsOffline }: UpdateCl
         </IonHeader> */}
         <div className="inner-content !p-6">
           {/* <div className="px-2 text-end">
-            {canDoAction(token.role, token.permissions, 'clients', 'visible') && (
+            {token && canDoAction(token.role, token.permissions, 'clients', 'visible') && (
               <>
                 <ViewBeneficiaries client={client} setData={setData} />
                 <ViewChildrens client={client} setData={setData} />

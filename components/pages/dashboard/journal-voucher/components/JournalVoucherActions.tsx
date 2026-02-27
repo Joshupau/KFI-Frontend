@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import ViewJournalVoucher from '../modals/ViewJournalVoucher';
 import UpdateJournalVoucher from '../modals/UpdateJournalVoucher';
@@ -36,12 +36,27 @@ const JournalVoucherActions = ({
   from,
   rowLength,
 }: JournalVoucherActionsProps) => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
+
+  if (!token) return null;
+
   return (
     <div>
-      {canDoAction(token.role, token.permissions, 'journal voucher', 'visible') && <ViewJournalVoucher journalVoucher={journalVoucher} />}
-      {canDoAction(token.role, token.permissions, 'journal voucher', 'update') && <UpdateJournalVoucher journalVoucher={journalVoucher} setData={setData} />}
-      {canDoAction(token.role, token.permissions, 'journal voucher', 'delete') && (
+      {token && canDoAction(token.role, token.permissions, 'journal voucher', 'visible') && <ViewJournalVoucher journalVoucher={journalVoucher} />}
+      {token && canDoAction(token.role, token.permissions, 'journal voucher', 'update') && <UpdateJournalVoucher journalVoucher={journalVoucher} setData={setData} />}
+      {token && canDoAction(token.role, token.permissions, 'journal voucher', 'delete') && (
         <DeleteJournalVoucher
           journalVoucher={journalVoucher}
           getJournalVouchers={getJournalVouchers}
@@ -51,8 +66,8 @@ const JournalVoucherActions = ({
           rowLength={rowLength}
         />
       )}
-      {canDoAction(token.role, token.permissions, 'journal voucher', 'print') && <PrintJournalVoucher journalVoucher={journalVoucher} />}
-      {canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportJournalVoucher journalVoucher={journalVoucher} />}
+      {token && canDoAction(token.role, token.permissions, 'journal voucher', 'print') && <PrintJournalVoucher journalVoucher={journalVoucher} />}
+      {token && canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportJournalVoucher journalVoucher={journalVoucher} />}
     </div>
     // <>
     //   <IonButton fill="clear" id={`journalVoucher-${journalVoucher._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
@@ -60,9 +75,9 @@ const JournalVoucherActions = ({
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`journalVoucher-${journalVoucher._id}`} triggerAction="click" className="[--max-width:11rem]">
     //     <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
-    //       {canDoAction(token.role, token.permissions, 'journal voucher', 'visible') && <ViewJournalVoucher journalVoucher={journalVoucher} />}
-    //       {canDoAction(token.role, token.permissions, 'journal voucher', 'update') && <UpdateJournalVoucher journalVoucher={journalVoucher} setData={setData} />}
-    //       {canDoAction(token.role, token.permissions, 'journal voucher', 'delete') && (
+    //       {token && canDoAction(token.role, token.permissions, 'journal voucher', 'visible') && <ViewJournalVoucher journalVoucher={journalVoucher} />}
+    //       {token && canDoAction(token.role, token.permissions, 'journal voucher', 'update') && <UpdateJournalVoucher journalVoucher={journalVoucher} setData={setData} />}
+    //       {token && canDoAction(token.role, token.permissions, 'journal voucher', 'delete') && (
     //         <DeleteJournalVoucher
     //           journalVoucher={journalVoucher}
     //           getJournalVouchers={getJournalVouchers}
@@ -72,8 +87,8 @@ const JournalVoucherActions = ({
     //           rowLength={rowLength}
     //         />
     //       )}
-    //       {canDoAction(token.role, token.permissions, 'journal voucher', 'print') && <PrintJournalVoucher journalVoucher={journalVoucher} />}
-    //       {canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportJournalVoucher journalVoucher={journalVoucher} />}
+    //       {token && canDoAction(token.role, token.permissions, 'journal voucher', 'print') && <PrintJournalVoucher journalVoucher={journalVoucher} />}
+    //       {token && canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportJournalVoucher journalVoucher={journalVoucher} />}
     //       <UpdateCVJournalVoucher index={journalVoucher._id} />
     //     </IonContent>
     //   </IonPopover>

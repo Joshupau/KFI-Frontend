@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ellipsisVertical, link, print } from 'ionicons/icons';
 import { AccessToken, ChartOfAccount } from '../../../../../types/types';
 import { TChartOfAccount } from '../ChartOfAccount';
@@ -19,15 +19,30 @@ type ChartOfAccountActionsProps = {
 };
 
 const ChartOfAccountActions = ({ chartAccount, setData, getChartOfAccounts, currentPage, setCurrentPage, searchKey, sortKey, rowLength }: ChartOfAccountActionsProps) => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
+
+  if (!token) return null;
+
   return (
-    <div>{canDoAction(token.role, token.permissions, 'chart of account', 'update') && <LinkChartOfAccount chartAccount={chartAccount} setData={setData} />}</div>
+    <div>{token && canDoAction(token.role, token.permissions, 'chart of account', 'update') && <LinkChartOfAccount chartAccount={chartAccount} setData={setData} />}</div>
     // <>
     //   <IonButton fill="clear" id={`coa-${chartAccount._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
     //     <IonIcon icon={ellipsisVertical} className="text-[#FA6C2F]" />
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`coa-${chartAccount._id}`} triggerAction="click" className="[--max-width:13rem]">
-    //     <IonContent>{canDoAction(token.role, token.permissions, 'chart of account', 'update') && <LinkChartOfAccount chartAccount={chartAccount} setData={setData} />}</IonContent>
+    //     <IonContent>{token && canDoAction(token.role, token.permissions, 'chart of account', 'update') && <LinkChartOfAccount chartAccount={chartAccount} setData={setData} />}</IonContent>
     //   </IonPopover>
     // </>
   );

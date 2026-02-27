@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import UpdateGroupAccount from '../modals/UpdateGroupAccount';
 import DeleteGroupAccount from '../modals/DeleteGroupAccount';
@@ -21,12 +21,27 @@ type GroupAccountActionsProps = {
 };
 
 const GroupAccountActions = ({ groupAccount, setData, currentPage, setCurrentPage, getGroupAccounts, searchKey, sortKey, rowLength }: GroupAccountActionsProps) => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const decoded: AccessToken = jwtDecode(authData);
+        setToken(decoded);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    }
+  }, []);
+
+  if (!token) return null;
+
   return (
     <div>
-      {canDoAction(token.role, token.permissions, 'group of account', 'visible') && <ViewGroupAccount groupAccount={groupAccount} />}
-      {canDoAction(token.role, token.permissions, 'group of account', 'update') && <UpdateGroupAccount groupAccount={groupAccount} setData={setData} />}
-      {canDoAction(token.role, token.permissions, 'group of account', 'delete') && (
+      {token && canDoAction(token.role, token.permissions, 'group of account', 'visible') && <ViewGroupAccount groupAccount={groupAccount} />}
+      {token && canDoAction(token.role, token.permissions, 'group of account', 'update') && <UpdateGroupAccount groupAccount={groupAccount} setData={setData} />}
+      {token && canDoAction(token.role, token.permissions, 'group of account', 'delete') && (
         <DeleteGroupAccount
           groupAccount={groupAccount}
           getGroupAccounts={getGroupAccounts}
@@ -43,8 +58,8 @@ const GroupAccountActions = ({ groupAccount, setData, currentPage, setCurrentPag
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`ga-${groupAccount._id}`} triggerAction="click" className="[--max-width:10rem]">
     //     <IonContent>
-    //       {canDoAction(token.role, token.permissions, 'group of account', 'update') && <UpdateGroupAccount groupAccount={groupAccount} setData={setData} />}
-    //       {canDoAction(token.role, token.permissions, 'group of account', 'delete') && (
+    //       {token && canDoAction(token.role, token.permissions, 'group of account', 'update') && <UpdateGroupAccount groupAccount={groupAccount} setData={setData} />}
+    //       {token && canDoAction(token.role, token.permissions, 'group of account', 'delete') && (
     //         <DeleteGroupAccount
     //           groupAccount={groupAccount}
     //           getGroupAccounts={getGroupAccounts}

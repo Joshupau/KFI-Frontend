@@ -5,6 +5,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
   deviceName: z.string().optional(),
   deviceType: z.string().optional(),
+  ipAddress: z.string().optional(),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;

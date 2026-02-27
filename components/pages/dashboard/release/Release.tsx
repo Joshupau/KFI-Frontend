@@ -1,5 +1,5 @@
 import { IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageTitle from '../../../ui/page/PageTitle';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import { canDoAction, haveActions } from '../../../utils/permissions';
@@ -32,7 +32,7 @@ export type TData = {
 };
 
 const Release = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
 
   const [present] = useIonToast();
 
@@ -51,6 +51,21 @@ const Release = () => {
     nextPage: false,
     prevPage: false,
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const getReleases = async (page: number, keyword: string = '', sort: string = '', to: string = '', from: string = '') => {
     if(online){
@@ -144,9 +159,9 @@ const Release = () => {
                 <div className=" flex flex-col gap-4 flex-wrap">
                
                 <div className="flex items-start flex-wrap">
-                  <div>{canDoAction(token.role, token.permissions, 'release', 'create') && <CreateRelease getReleases={getReleases} />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'release', 'print') && <PrintAllRelease />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'release', 'export') && <ExportAllRelease />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'release', 'create') && <CreateRelease getReleases={getReleases} />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'release', 'print') && <PrintAllRelease />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'release', 'export') && <ExportAllRelease />}</div>
                 </div>
 
                  <div className="w-full flex-1 flex ">
@@ -163,7 +178,7 @@ const Release = () => {
                       <TableHead>CHK. No.</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Encoded By</TableHead>
-                      {haveActions(token.role, 'release', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
+                      {token && haveActions(token.role, 'release', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -175,11 +190,11 @@ const Release = () => {
                         <TableRow key={release._id}>
                           <TableCell>{release.code}</TableCell>
                           <TableCell>{formatDateTable(release.date)}</TableCell>
-                          <TableCell>{release.bankCode.description}</TableCell>
+                          <TableCell>{release.bank.description}</TableCell>
                           <TableCell>{release.checkNo}</TableCell>
                           <TableCell>{formatMoney(release.amount)}</TableCell>
                           <TableCell>{release.encodedBy.username}</TableCell>
-                          {haveActions(token.role, 'release', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
+                          {token && haveActions(token.role, 'release', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
                             <TableCell>
                               <ReleaseActions
                                 release={release}

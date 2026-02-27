@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateGroupAccount from './modals/CreateGroupAccount';
@@ -27,7 +27,7 @@ export type TGroupAccount = {
 };
 
 const GroupAccount = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -45,6 +45,21 @@ const GroupAccount = () => {
     nextPage: false,
     prevPage: false,
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const getGroupAccounts = async (page: number, keyword: string = '', sort: string = '') => {
     if(online){
@@ -168,7 +183,7 @@ const GroupAccount = () => {
 
               <div className=" flex lg:flex-row flex-col items-start justify-start">
                 <div className=' flex flex-wrap items-center gap-2'>
-                  {canDoAction(token.role, token.permissions, 'group of account', 'create') && <CreateGroupAccount getGroupAccounts={getGroupAccounts} />}
+                  {token && canDoAction(token.role, token.permissions, 'group of account', 'create') && <CreateGroupAccount getGroupAccounts={getGroupAccounts} />}
                  {!online && (
                     <IonButton disabled={uploading} onClick={uploadGroups} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                       <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -182,7 +197,7 @@ const GroupAccount = () => {
                   <TableHeader>
                     <TableHeadRow>
                       <TableHead>Group Account</TableHead>
-                      {haveActions(token.role, 'group of account', token.permissions, ['update', 'delete']) && <TableHead>Actions</TableHead>}
+                      {token && haveActions(token.role, 'group of account', token.permissions, ['update', 'delete']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -193,7 +208,7 @@ const GroupAccount = () => {
                       data.groupAccounts.map((groupAccount: GroupAccountType) => (
                         <TableRow key={groupAccount._id}>
                           <TableCell>{groupAccount.code}</TableCell>
-                          {haveActions(token.role, 'group of account', token.permissions, ['update', 'delete']) && (
+                          {token && haveActions(token.role, 'group of account', token.permissions, ['update', 'delete']) && (
                             <TableCell>
                               <GroupAccountActions
                                 groupAccount={groupAccount}

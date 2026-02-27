@@ -1,5 +1,5 @@
 import { IonButton } from '@ionic/react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TransactionNav from './nav-menu/TransactionNav';
 import GeneralLedgerNav from './nav-menu/GeneralLedgerNav';
 import SystemNav from './nav-menu/SystemNav';
@@ -14,8 +14,25 @@ import { DashboardSquare01Icon, ListViewIcon, UserMultiple02Icon  } from 'hugeic
 
 
 const TopNavigation = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
+
+  if (!token) return null;
 
   return (
     <div className=" hidden lg:flex p-1 font-semibold text-sm h-12 bg-orange-50 rounded-md">

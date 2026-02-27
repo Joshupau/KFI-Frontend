@@ -37,6 +37,7 @@ const BeginningBalance = () => {
 
             const { beginningBalances, success,hasPrevPage, hasNextPage, totalPages } = result.data
 
+            console.log(result.data)
             if(success){
                setData(prev => ({
               ...prev,

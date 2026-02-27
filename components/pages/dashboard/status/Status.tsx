@@ -1,5 +1,5 @@
 import { IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageTitle from '../../../ui/page/PageTitle';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import { TABLE_LIMIT } from '../../../utils/constants';
@@ -23,7 +23,7 @@ export type TStatus = {
 };
 
 const Status = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -37,6 +37,21 @@ const Status = () => {
     nextPage: false,
     prevPage: false,
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const getStatuses = async (page: number, keyword: string = '', sort: string = '') => {
     setData(prev => ({ ...prev, loading: true }));
@@ -82,7 +97,7 @@ const Status = () => {
           <PageTitle pages={['All Files', 'Status']} />
           <div className="px-3 pb-3 flex-1">
             <div className="flex items-center justify-center gap-3 bg-white px-3 py-2 rounded-2xl shadow-lg mt-3 mb-4">
-              <div>{canDoAction(token.role, token.permissions, 'loans', 'create') && <CreateStatus getStatuses={getStatuses} />}</div>
+              <div>{token && canDoAction(token.role, token.permissions, 'loans', 'create') && <CreateStatus getStatuses={getStatuses} />}</div>
               <StatusFilter getStatuses={getStatuses} />
             </div>
             <div className="relative overflow-auto">
@@ -91,7 +106,7 @@ const Status = () => {
                   <TableHeadRow>
                     <TableHead>Code</TableHead>
                     <TableHead>Description</TableHead>
-                    {haveActions(token.role, 'loans', token.permissions, ['update', 'delete']) && <TableHead>Actions</TableHead>}
+                    {token && haveActions(token.role, 'loans', token.permissions, ['update', 'delete']) && <TableHead>Actions</TableHead>}
                   </TableHeadRow>
                 </TableHeader>
                 <TableBody>
@@ -103,7 +118,7 @@ const Status = () => {
                       <TableRow key={status._id}>
                         <TableCell>{status.code}</TableCell>
                         <TableCell>{status.description}</TableCell>
-                        {haveActions(token.role, 'loans', token.permissions, ['update', 'delete']) && (
+                        {token && haveActions(token.role, 'loans', token.permissions, ['update', 'delete']) && (
                           <TableCell>
                             <StatusActions
                               status={status}

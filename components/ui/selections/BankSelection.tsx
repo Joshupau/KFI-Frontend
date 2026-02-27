@@ -205,7 +205,7 @@ const BankSelection = <T extends FieldValues>({ bankLabel, bankValue, setValue, 
               </TableHeader>
               <TableBody>
                 {loading && <TableLoadingRow colspan={2} />}
-                {!loading && data.banks.length < 1 && <TableNoRows colspan={2} label="No bank found" />}
+                {!loading && data.banks?.length < 1 && <TableNoRows colspan={2} label="No bank found" />}
                 {!loading &&
                   data.banks.map((data: Option) => (
                     <TableRow onClick={() => handleSelectBusinessType(data)} key={data._id} className="border-b-0 [&>td]:!py-1 cursor-pointer">

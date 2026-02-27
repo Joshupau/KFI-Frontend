@@ -1,6 +1,6 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
 import { chevronDownOutline } from 'ionicons/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NoChildNav from './NoChildNav';
 import { AccessToken, NavLink, Permission } from '../../../../types/types';
 import WithChildNav from './WithChildNav';
@@ -13,7 +13,22 @@ import { ToolsIcon  } from 'hugeicons-react';
 const Diagnostics = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const fileLinks: NavLink[] = [
     { path: '/dashboard/unbalance-entries', label: 'Unbalance Entries', resource: 'unbalance entries' },
@@ -41,7 +56,7 @@ const Diagnostics = () => {
         <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
           {fileLinks.map(
             link =>
-              (token.role === 'superadmin' || token.permissions.find((e: Permission) => link.resource.includes(e.resource) && e.actions.visible)) &&
+              (token && (token.role === 'superadmin' || token.permissions.find((e: Permission) => link.resource.includes(e.resource) && e.actions.visible))) &&
               (link.children ? (
                 <WithChildNav key={link.label} label={link.label} resource={link.resource} childPaths={link.children} />
               ) : (

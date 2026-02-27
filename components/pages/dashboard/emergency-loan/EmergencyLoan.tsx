@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageTitle from '../../../ui/page/PageTitle';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import { canDoAction, haveActions } from '../../../utils/permissions';
@@ -32,7 +32,7 @@ export type TData = {
 };
 
 const EmergencyLoan = () => {
-  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+  const [token, setToken] = useState<AccessToken | null>(null);
 
   const [present] = useIonToast();
 
@@ -51,6 +51,21 @@ const EmergencyLoan = () => {
     nextPage: false,
     prevPage: false,
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const authToken = localStorage.getItem('auth');
+        if (authToken) {
+          const decoded: AccessToken = jwtDecode(authToken);
+          setToken(decoded);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('auth');
+      }
+    }
+  }, []);
 
   const getEmergencyLoans = async (page: number, keyword: string = '', sort: string = '', to: string = '', from: string = '') => {
     if(online){
@@ -174,9 +189,9 @@ const EmergencyLoan = () => {
                <div className=" flex flex-col gap-4 flex-wrap">
                
                 <div className="flex items-start flex-wrap">
-                  <div>{canDoAction(token.role, token.permissions, 'emergency loan', 'create') && <CreateEmergencyLoan getEmergencyLoans={getEmergencyLoans} />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'emergency loan', 'print') && <PrintAllEmergencyLoan />}</div>
-                  <div>{canDoAction(token.role, token.permissions, 'emergency loan', 'export') && <ExportAllEmergencyLoan />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'emergency loan', 'create') && <CreateEmergencyLoan getEmergencyLoans={getEmergencyLoans} />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'emergency loan', 'print') && <PrintAllEmergencyLoan />}</div>
+                  <div>{token && canDoAction(token.role, token.permissions, 'emergency loan', 'export') && <ExportAllEmergencyLoan />}</div>
                   {online && (
                     <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                       <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -198,7 +213,7 @@ const EmergencyLoan = () => {
                       <TableHead>CHK. No.</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Encoded By</TableHead>
-                      {haveActions(token.role, 'emergency loan', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
+                      {token && haveActions(token.role, 'emergency loan', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -207,14 +222,14 @@ const EmergencyLoan = () => {
                     {!data.loading &&
                       data.emergencyLoans.length > 0 &&
                       data.emergencyLoans.map((emergencyLoan: EmergencyLoanType, i: number) => (
-                        <TableRow key={emergencyLoan._id}>
-                          <TableCell>{emergencyLoan.code}</TableCell>
+                        <TableRow key={emergencyLoan?._id || i}>
+                          <TableCell>{emergencyLoan?.code || ""}</TableCell>
                           <TableCell>{formatDateTable(emergencyLoan.date)}</TableCell>
-                          <TableCell>{emergencyLoan.bankCode.description}</TableCell>
+                          <TableCell>{emergencyLoan.bank?.description || ""}</TableCell>
                           <TableCell>{emergencyLoan.checkNo}</TableCell>
                           <TableCell>{formatMoney(emergencyLoan.amount)}</TableCell>
                           <TableCell>{emergencyLoan.encodedBy?.username}</TableCell>
-                          {haveActions(token.role, 'emergency loan', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
+                          {token && haveActions(token.role, 'emergency loan', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
                             <TableCell>
                               <EmergencyLoanActions
                                 emergencyLoan={emergencyLoan}
