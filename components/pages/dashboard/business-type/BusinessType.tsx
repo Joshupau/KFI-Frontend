@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateBusinessType from './modals/CreateBusinessType';
@@ -28,7 +28,7 @@ export type TBusinessType = {
 };
 
 const BusinessType = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -46,18 +46,6 @@ const BusinessType = () => {
     nextPage: false,
     prevPage: false,
   });
-
-  useEffect(() => {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      try {
-        const decoded: AccessToken = jwtDecode(authData);
-        setToken(decoded);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-      }
-    }
-  }, []);
 
   const getBusinessTypes = async (page: number, keyword: string = '', sort: string = '') => {
    if(online){
@@ -182,7 +170,7 @@ const BusinessType = () => {
            
             <div className="px-3 pt-3 pb-5 bg-white rounded-xl flex-1 shadow-lg">
                <div className="flex flex-col lg:flex-row items-start justify-start ">
-                <div className=' flex flex-wrap gap-2'>{token && canDoAction(token.role, token.permissions, 'business type', 'create') && <CreateBusinessType getBusinessTypes={getBusinessTypes} />}
+                <div className=' flex flex-wrap gap-2'>{canDoAction(token.role, token.permissions, 'business type', 'create') && <CreateBusinessType getBusinessTypes={getBusinessTypes} />}
                 {!online && (
                   <IonButton disabled={uploading} onClick={uploadBusinessTypes} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                     <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -196,18 +184,18 @@ const BusinessType = () => {
                   <TableHeader>
                     <TableHeadRow>
                       <TableHead>Business Type</TableHead>
-                      {token && haveActions(token.role, 'business type', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'business type', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
                     {data.loading && <TableLoadingRow colspan={3} />}
-                    {!data.loading && data?.businessTypes?.length < 1 && <TableNoRows label="No Business Type Record Found" colspan={3} />}
+                    {!data.loading && data.businessTypes.length < 1 && <TableNoRows label="No Business Type Record Found" colspan={3} />}
                     {!data.loading &&
-                      data?.businessTypes?.length > 0 &&
+                      data.businessTypes.length > 0 &&
                       data.businessTypes.map((businessType: BusinessTypeInt) => (
                         <TableRow key={businessType._id}>
                           <TableCell>{businessType.type}</TableCell>
-                          {token && haveActions(token.role, 'business type', token.permissions, ['update', 'delete', 'visible']) && (
+                          {haveActions(token.role, 'business type', token.permissions, ['update', 'delete', 'visible']) && (
                             <TableCell>
                               <BusinessTypeActions
                                 businessType={businessType}

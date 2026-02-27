@@ -62,7 +62,7 @@ const ViewEmergencyLoan = ({ emergencyLoan }: { emergencyLoan: EmergencyLoan }) 
                  <div className="space-y-1">
                   <JournalVoucherViewCard label="Check Number" value={emergencyLoan.checkNo} labelClassName="min-w-20 text-end" />
                   <JournalVoucherViewCard label="Check Date" value={formatDateTable(emergencyLoan.checkDate)} labelClassName="min-w-20 text-end" />
-                  <JournalVoucherViewCard label="Bank Code" value={emergencyLoan.bank.code} labelClassName="min-w-20 text-end" />
+                  <JournalVoucherViewCard label="Bank Code" value={emergencyLoan.bankCode.code} labelClassName="min-w-20 text-end" />
                   <JournalVoucherViewCard label="Amount" value={`${formatNumber(emergencyLoan.amount)}`} labelClassName="min-w-20 text-end" />
                 </div>
 

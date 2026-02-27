@@ -30,7 +30,7 @@ const Login = () => {
       password: '',
       deviceName: 'My PC',
       deviceType: 'dekstop',
-      ipAddress: '',
+
     },
   });
 
@@ -52,7 +52,7 @@ const Login = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setLoading(true);
-      const result = await kfiAxios.post('/auth/login',{username: data.username, password: data.password, deviceName: 'My PC Name', deviceType: 'desktop', ipAddress: '0.0.0.0'});
+      const result = await kfiAxios.post('/auth/login',{username: data.username, password: data.password, deviceName: 'My PC Name', deviceType: 'desktop'});
       const { success, access } = result.data;
       if (success) {
         const token = jwtDecode(access) as AccessToken;

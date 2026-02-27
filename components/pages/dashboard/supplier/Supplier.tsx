@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, IonTitle, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateSupplier from './modals/CreateSupplier';
@@ -27,7 +27,7 @@ export type TSupplier = {
 };
 
 const Supplier = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -43,21 +43,6 @@ const Supplier = () => {
     nextPage: false,
     prevPage: false,
   });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
 
   const getSuppliers = async (page: number, keyword: string = '', sort: string = '') => {
     if(online){
@@ -168,7 +153,7 @@ const Supplier = () => {
            
             <div className="px-3 pt-3 pb-5 bg-white rounded-xl flex-1 shadow-lg">
                <div className="flex flex-col lg:flex-row items-start justify-start ">
-                <div className=' flex flex-wrap gap-2'>{token && canDoAction(token.role, token.permissions, 'business supplier', 'create') && <CreateSupplier getSuppliers={getSuppliers} />}
+                <div className=' flex flex-wrap gap-2'>{canDoAction(token.role, token.permissions, 'business supplier', 'create') && <CreateSupplier getSuppliers={getSuppliers} />}
                  {online && (
                    <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                      <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -183,7 +168,7 @@ const Supplier = () => {
                     <TableHeadRow>
                       <TableHead>Code</TableHead>
                       <TableHead>Description</TableHead>
-                      {token && haveActions(token.role, 'business supplier', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'business supplier', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -193,7 +178,7 @@ const Supplier = () => {
                       <TableRow key={supplier._id}>
                         <TableCell>{supplier.code}</TableCell>
                         <TableCell>{supplier.description}</TableCell>
-                        {token && haveActions(token.role, 'business supplier', token.permissions, ['update', 'delete', 'visible']) && (
+                        {haveActions(token.role, 'business supplier', token.permissions, ['update', 'delete', 'visible']) && (
                           <TableCell>
                             <SupplierActions
                               supplier={supplier}

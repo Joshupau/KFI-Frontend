@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ellipsisVertical, print } from 'ionicons/icons';
 import DeleteExpenseVoucher from '../modals/DeleteExpenseVoucher';
 import UpdateExpenseVoucher from '../modals/UpdateExpenseVoucher';
@@ -37,27 +37,13 @@ const ExpenseVoucherActions = ({
   from,
   rowLength,
 }: ExpenseVoucherActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      try {
-        const decoded: AccessToken = jwtDecode(authData);
-        setToken(decoded);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   return (
     <div>
-      {token && canDoAction(token.role, token.permissions, 'expense voucher', 'visible') && <ViewExpenseVoucher expenseVoucher={expenseVoucher} />}
-      {token && canDoAction(token.role, token.permissions, 'expense voucher', 'update') && <UpdateExpenseVoucher expenseVoucher={expenseVoucher} setData={setData} getExpenseVouchers={getExpenseVouchers} currentPage={currentPage} />}
-      {token && canDoAction(token.role, token.permissions, 'expense voucher', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'expense voucher', 'visible') && <ViewExpenseVoucher expenseVoucher={expenseVoucher} />}
+      {canDoAction(token.role, token.permissions, 'expense voucher', 'update') && <UpdateExpenseVoucher expenseVoucher={expenseVoucher} setData={setData} getExpenseVouchers={getExpenseVouchers} currentPage={currentPage} />}
+      {canDoAction(token.role, token.permissions, 'expense voucher', 'delete') && (
         <DeleteExpenseVoucher
           expenseVoucher={expenseVoucher}
           getExpenseVouchers={getExpenseVouchers}
@@ -67,8 +53,8 @@ const ExpenseVoucherActions = ({
           rowLength={rowLength}
         />
       )}
-      {token && canDoAction(token.role, token.permissions, 'expense voucher', 'print') && <PrintExpenseVoucher expenseVoucher={expenseVoucher} />}
-      {token && canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportExpenseVoucher expenseVoucher={expenseVoucher} />}
+      {canDoAction(token.role, token.permissions, 'expense voucher', 'print') && <PrintExpenseVoucher expenseVoucher={expenseVoucher} />}
+      {canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportExpenseVoucher expenseVoucher={expenseVoucher} />}
     </div>
     // <>
     //   <IonButton fill="clear" id={`expenseVoucher-${expenseVoucher._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
@@ -76,9 +62,9 @@ const ExpenseVoucherActions = ({
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`expenseVoucher-${expenseVoucher._id}`} triggerAction="click" className="[--max-width:11rem]">
     //     <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
-    //       {token && canDoAction(token.role, token.permissions, 'expense voucher', 'visible') && <ViewExpenseVoucher expenseVoucher={expenseVoucher} />}
-    //       {token && canDoAction(token.role, token.permissions, 'expense voucher', 'update') && <UpdateExpenseVoucher expenseVoucher={expenseVoucher} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'expense voucher', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'expense voucher', 'visible') && <ViewExpenseVoucher expenseVoucher={expenseVoucher} />}
+    //       {canDoAction(token.role, token.permissions, 'expense voucher', 'update') && <UpdateExpenseVoucher expenseVoucher={expenseVoucher} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'expense voucher', 'delete') && (
     //         <DeleteExpenseVoucher
     //           expenseVoucher={expenseVoucher}
     //           getExpenseVouchers={getExpenseVouchers}
@@ -88,8 +74,8 @@ const ExpenseVoucherActions = ({
     //           rowLength={rowLength}
     //         />
     //       )}
-    //       {token && canDoAction(token.role, token.permissions, 'expense voucher', 'print') && <PrintExpenseVoucher expenseVoucher={expenseVoucher} />}
-    //       {token && canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportExpenseVoucher expenseVoucher={expenseVoucher} />}
+    //       {canDoAction(token.role, token.permissions, 'expense voucher', 'print') && <PrintExpenseVoucher expenseVoucher={expenseVoucher} />}
+    //       {canDoAction(token.role, token.permissions, 'expense voucher', 'export') && <ExportExpenseVoucher expenseVoucher={expenseVoucher} />}
     //        <UpdateCVExpenseVoucher index={index} />
     //     </IonContent>
     //   </IonPopover>

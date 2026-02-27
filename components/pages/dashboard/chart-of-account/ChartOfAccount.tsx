@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import ChartOfAccountFilter from './components/ChartOfAccountFilter';
 import PageTitle from '../../../ui/page/PageTitle';
@@ -29,7 +29,8 @@ export type TChartOfAccount = {
 };
 
 const ChartOfAccount = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
+
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -45,18 +46,6 @@ const ChartOfAccount = () => {
     nextPage: false,
     prevPage: false,
   });
-
-  useEffect(() => {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      try {
-        const decoded: AccessToken = jwtDecode(authData);
-        setToken(decoded);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-      }
-    }
-  }, []);
 
   const getChartOfAccounts = async (page: number, keyword: string = '', sort: string = '') => {
    if(online){
@@ -180,8 +169,8 @@ const ChartOfAccount = () => {
             <div className="p-4 pb-5 bg-white rounded-xl flex-1 shadow-lg">
                 <div className="flex lg:flex-row flex-col flex-wrap gap-2  ">
                   <div>
-                    {token && canDoAction(token.role, token.permissions, 'chart of account', 'print') && <PrintAllChartOfAccount />}
-                    {token && canDoAction(token.role, token.permissions, 'chart of account', 'export') && <ExportAllChartOfAccount />}
+                    {canDoAction(token.role, token.permissions, 'chart of account', 'print') && <PrintAllChartOfAccount />}
+                    {canDoAction(token.role, token.permissions, 'chart of account', 'export') && <ExportAllChartOfAccount />}
                     {/* {!online && (
                       <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                         <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -199,7 +188,7 @@ const ChartOfAccount = () => {
                       <TableHead>Nature of Account</TableHead>
                       <TableHead>Classification</TableHead>
                       <TableHead>Department Status</TableHead>
-                      {token && haveActions(token.role, 'chart of account', token.permissions, ['update']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'chart of account', token.permissions, ['update']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -214,7 +203,7 @@ const ChartOfAccount = () => {
                           <TableCell>{chartAccount.nature}</TableCell>
                           <TableCell>{chartAccount.classification}</TableCell>
                           <TableCell>{chartAccount.deptStatus}</TableCell>
-                          {token && haveActions(token.role, 'chart of account', token.permissions, ['update']) && (
+                          {haveActions(token.role, 'chart of account', token.permissions, ['update']) && (
                             <TableCell>
                               <ChartOfAccountActions
                                 chartAccount={chartAccount}

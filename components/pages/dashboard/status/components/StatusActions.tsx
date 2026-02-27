@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import { AccessToken, Status } from '../../../../../types/types';
 import { jwtDecode } from 'jwt-decode';
@@ -20,24 +20,7 @@ type StatusActionsProps = {
 };
 
 const StatusActions = ({ status, setData, currentPage, setCurrentPage, getStatuses, searchKey, sortKey, rowLength }: StatusActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   return (
     <>
@@ -46,8 +29,8 @@ const StatusActions = ({ status, setData, currentPage, setCurrentPage, getStatus
       </IonButton>
       <IonPopover showBackdrop={false} trigger={`status-${status._id}`} triggerAction="click" className="[--max-width:10rem]">
         <IonContent>
-          {token && canDoAction(token.role, token.permissions, 'status', 'update') && <UpdateStatus status={status} setData={setData} />}
-          {token && canDoAction(token.role, token.permissions, 'status', 'delete') && (
+          {canDoAction(token.role, token.permissions, 'status', 'update') && <UpdateStatus status={status} setData={setData} />}
+          {canDoAction(token.role, token.permissions, 'status', 'delete') && (
             <DeleteStatus status={status} getStatuses={getStatuses} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
           )}
         </IonContent>

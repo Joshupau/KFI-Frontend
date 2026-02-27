@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import UpdateLoan from '../modals/UpdateLoan';
 import DeleteLoan from '../modals/DeleteLoan';
@@ -21,30 +21,13 @@ type LoanActionsProps = {
 };
 
 const LoanActions = ({ loan, setData, currentPage, setCurrentPage, getLoans, searchKey, sortKey, rowLength }: LoanActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   return (
     <div>
-      {token && canDoAction(token.role, token.permissions, 'product', 'visible') && <ViewLoanCodes loan={loan} />}
-      {token && canDoAction(token.role, token.permissions, 'product', 'update') && <UpdateLoan loan={loan} setData={setData} />}
-      {token && canDoAction(token.role, token.permissions, 'product', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'product', 'visible') && <ViewLoanCodes loan={loan} />}
+      {canDoAction(token.role, token.permissions, 'product', 'update') && <UpdateLoan loan={loan} setData={setData} />}
+      {canDoAction(token.role, token.permissions, 'product', 'delete') && (
         <DeleteLoan loan={loan} getLoans={getLoans} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
     </div>
@@ -54,9 +37,9 @@ const LoanActions = ({ loan, setData, currentPage, setCurrentPage, getLoans, sea
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`loan-${loan._id}`} triggerAction="click" className="[--max-width:12rem]">
     //     <IonContent>
-    //       {token && canDoAction(token.role, token.permissions, 'product', 'visible') && <ViewLoanCodes loan={loan} />}
-    //       {token && canDoAction(token.role, token.permissions, 'product', 'update') && <UpdateLoan loan={loan} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'product', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'product', 'visible') && <ViewLoanCodes loan={loan} />}
+    //       {canDoAction(token.role, token.permissions, 'product', 'update') && <UpdateLoan loan={loan} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'product', 'delete') && (
     //         <DeleteLoan loan={loan} getLoans={getLoans} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
     //       )}
     //     </IonContent>

@@ -44,9 +44,8 @@ import Admin from './dashboard/admin/Admin';
 import { jwtDecode } from 'jwt-decode';
 import { AccessToken } from '../../types/types';
 import Dashboard from './dashboard/home/Dashboard';
-import kfiAxios from '../utils/axios';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Acknowledgement from './dashboard/acknowledgement/Acknowledgement';
 import Release from './dashboard/release/Release';
 import AuditTrail from './dashboard/audit-trail/AuditTrail';
@@ -189,31 +188,13 @@ const navLinks: NavLink[] = [
 
 
 const Tabs = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const pathname = usePathname();
   const location = useLocation();
 
   const online = useOnlineStore((state) => state.online);
-
-  useEffect(() => {
-    // Only run on client-side
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        // Clear invalid token
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
   
 
-<<<<<<< Updated upstream
 
   const logout = () => {
     localStorage.removeItem('auth');
@@ -223,26 +204,6 @@ const Tabs = () => {
       (window as any).ipcRenderer.send('reload-window');
     } else {
       (window as any).location.reload();
-=======
-  const logout = async () => {
-    try {
-      // Call backend to clear cache
-      await kfiAxios.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Always clear local storage and reload
-      localStorage.removeItem('auth');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
-      if (isPlatform('capacitor')) {
-        (window as any).location.reload(true);
-      } else if (isPlatform('electron')) {
-        (window as any).ipcRenderer.send('reload-window');
-      } else {
-        (window as any).location.reload();
-      }
->>>>>>> Stashed changes
     }
   };
 
@@ -406,7 +367,7 @@ const Tabs = () => {
 
             <div className="flex items-center justify-center py-1 rounded-md">
               <div className="flex items-center justify-center gap-2 capitalize ">
-                <span className="hidden lg:flex text-[0.8rem] font-semibold">{token?.username || 'User'}</span>
+                <span className="hidden lg:flex text-[0.8rem] font-semibold">{token.username}</span>
                 <IonButton
                   fill="clear"
                   className="min-h-[3.5rem] border-[#FA6C2F] !m-0 [--color:black]"
@@ -417,7 +378,7 @@ const Tabs = () => {
                     <div className={`${online ? ' bg-green-400' : ' bg-red-600'} h-4 w-4 rounded-full absolute bottom-0 right-0 translate-y-1`}>
 
                     </div>
-                    {token?.username?.substring(0, 2) || 'U'}
+                    {token.username.substring(0, 2)}
                   </div>
                 </IonButton>
               </div>

@@ -62,7 +62,7 @@ const ViewDamayanFund = ({ damayanFund }: { damayanFund: DamayanFund }) => {
                  <div className="space-y-1">
                   <DamayanFundViewCard label="Check Number" value={damayanFund.checkNo} labelClassName="min-w-24 text-end" />
                   <DamayanFundViewCard label="Check Date" value={formatDateTable(damayanFund.checkDate)} labelClassName="min-w-24 text-end" />
-                  <DamayanFundViewCard label="Bank Code" value={damayanFund.bank.code} labelClassName="min-w-24 text-end" />
+                  <DamayanFundViewCard label="Bank Code" value={damayanFund.bankCode.code} labelClassName="min-w-24 text-end" />
                   <DamayanFundViewCard label="Amount" value={`${formatNumber(damayanFund.amount)}`} labelClassName="min-w-24 text-end" />
                 </div>
                 <div className=" lg:col-span-3 space-y-1">

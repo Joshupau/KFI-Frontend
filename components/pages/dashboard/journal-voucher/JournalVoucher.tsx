@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PageTitle from '../../../ui/page/PageTitle';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import CreateJournalVoucher from './modals/CreateJournalVoucher';
@@ -32,7 +32,7 @@ export type TData = {
 };
 
 const JournalVoucher = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   const [present] = useIonToast();
 
@@ -53,21 +53,6 @@ const JournalVoucher = () => {
     nextPage: false,
     prevPage: false,
   });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
 
   const getJournalVouchers = async (page: number, keyword: string = '', sort: string = '', to: string = '', from: string = '') => {
    if(online){
@@ -197,9 +182,9 @@ const JournalVoucher = () => {
                  <div className=" bg-white flex flex-col gap-4 flex-wrap">
                  
                   <div className="flex items-start flex-wrap">
-                    <div>{token && canDoAction(token.role, token.permissions, 'journal voucher', 'create') && <CreateJournalVoucher getJournalVouchers={getJournalVouchers} />}</div>
-                    <div>{token && canDoAction(token.role, token.permissions, 'journal voucher', 'print') && <PrintAllJournalVoucher />}</div>
-                    <div>{token && canDoAction(token.role, token.permissions, 'journal voucher', 'export') && <ExportAllJournalVoucher />}</div>
+                    <div>{canDoAction(token.role, token.permissions, 'journal voucher', 'create') && <CreateJournalVoucher getJournalVouchers={getJournalVouchers} />}</div>
+                    <div>{canDoAction(token.role, token.permissions, 'journal voucher', 'print') && <PrintAllJournalVoucher />}</div>
+                    <div>{canDoAction(token.role, token.permissions, 'journal voucher', 'export') && <ExportAllJournalVoucher />}</div>
                     {online && (
                       <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                         <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -221,7 +206,7 @@ const JournalVoucher = () => {
                       <TableHead>CHK. No.</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Encoded By</TableHead>
-                      {token && haveActions(token.role, 'journal voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'journal voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -236,7 +221,7 @@ const JournalVoucher = () => {
                           <TableCell>{journalVoucher.checkNo}</TableCell>
                           <TableCell>{formatNumber(journalVoucher.amount)}</TableCell>
                           <TableCell>{journalVoucher.encodedBy.username}</TableCell>
-                          {token && haveActions(token.role, 'expense voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
+                          {haveActions(token.role, 'expense voucher', token.permissions, ['update', 'delete', 'visible', 'print', 'export']) && (
                             <TableCell>
                               <JournalVoucherActions
                                 journalVoucher={journalVoucher}

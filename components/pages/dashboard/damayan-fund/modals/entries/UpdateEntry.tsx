@@ -40,7 +40,6 @@ const UpdateEntry = ({ entry, setData, setEntries }: UpdateEntryProps) => {
     },
   });
 
-  console.log('Entry in UpdateEntry:', entry);
   useEffect(() => {
     if (entry) {
       form.reset({
@@ -50,8 +49,8 @@ const UpdateEntry = ({ entry, setData, setEntries }: UpdateEntryProps) => {
         acctCodeId: entry.acctCode._id,
         acctCode: entry.acctCode.code,
         description: entry.acctCode.description,
-        debit: `${formatAmount(entry.debit || 0)}`,
-        credit: `${formatAmount(entry.credit || 0)}`,
+        debit: `${formatAmount(entry.debit)}`,
+        credit: `${formatAmount(entry.credit)}`,
       });
     }
   }, [form, entry]);

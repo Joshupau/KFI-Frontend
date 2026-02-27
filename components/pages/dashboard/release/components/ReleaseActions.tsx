@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import { AccessToken, Release } from '../../../../../types/types';
 import { canDoAction } from '../../../../utils/permissions';
@@ -25,34 +25,17 @@ type ReleaseActionsProps = {
 };
 
 const ReleaseActions = ({ release, setData, getReleases, currentPage, setCurrentPage, searchKey, sortKey, to, from, rowLength }: ReleaseActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   return (
     <div>
-      {token && canDoAction(token.role, token.permissions, 'release', 'visible') && <ViewRelease release={release} />}
-      {token && canDoAction(token.role, token.permissions, 'release', 'update') && <UpdateRelease release={release} setData={setData} getReleases={getReleases} currentPage={currentPage} />}
-      {token && canDoAction(token.role, token.permissions, 'release', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'release', 'visible') && <ViewRelease release={release} />}
+      {canDoAction(token.role, token.permissions, 'release', 'update') && <UpdateRelease release={release} setData={setData} getReleases={getReleases} currentPage={currentPage} />}
+      {canDoAction(token.role, token.permissions, 'release', 'delete') && (
         <DeleteRelease release={release} getRelease={getReleases} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
-      {token && canDoAction(token.role, token.permissions, 'release', 'print') && <PrintRelease release={release} />}
-      {token && canDoAction(token.role, token.permissions, 'release', 'export') && <ExportRelease release={release} />}
+      {canDoAction(token.role, token.permissions, 'release', 'print') && <PrintRelease release={release} />}
+      {canDoAction(token.role, token.permissions, 'release', 'export') && <ExportRelease release={release} />}
     </div>
     // <>
     //   <IonButton fill="clear" id={`release-${release._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
@@ -60,13 +43,13 @@ const ReleaseActions = ({ release, setData, getReleases, currentPage, setCurrent
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`release-${release._id}`} triggerAction="click" className="[--max-width:11rem]">
     //     <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
-    //       {token && canDoAction(token.role, token.permissions, 'release', 'visible') && <ViewRelease release={release} />}
-    //       {token && canDoAction(token.role, token.permissions, 'release', 'update') && <UpdateRelease release={release} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'release', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'release', 'visible') && <ViewRelease release={release} />}
+    //       {canDoAction(token.role, token.permissions, 'release', 'update') && <UpdateRelease release={release} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'release', 'delete') && (
     //         <DeleteRelease release={release} getRelease={getReleases} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
     //       )}
-    //       {token && canDoAction(token.role, token.permissions, 'release', 'print') && <PrintRelease release={release} />}
-    //       {token && canDoAction(token.role, token.permissions, 'release', 'export') && <ExportRelease release={release} />}
+    //       {canDoAction(token.role, token.permissions, 'release', 'print') && <PrintRelease release={release} />}
+    //       {canDoAction(token.role, token.permissions, 'release', 'export') && <ExportRelease release={release} />}
     //       {/* <UpdateCVExpenseVoucher index={index} /> */}
     //     </IonContent>
     //   </IonPopover>

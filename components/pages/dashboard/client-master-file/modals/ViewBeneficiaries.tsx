@@ -1,6 +1,6 @@
 import { IonButton, IonHeader, IonIcon, IonModal, IonToolbar } from '@ionic/react';
 import { person } from 'ionicons/icons';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { AccessToken, Beneficiary, ClientMasterFile } from '../../../../../types/types';
 import ModalHeader from '../../../../ui/page/ModalHeader';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../../ui/table/Table';
@@ -17,25 +17,8 @@ type ViewBeneficiariesProps = {
 };
 
 const ViewBeneficiaries = ({ client, setData }: ViewBeneficiariesProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const modal = useRef<HTMLIonModalElement>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
 
   function dismiss() {
     modal.current?.dismiss();
@@ -72,7 +55,7 @@ const ViewBeneficiaries = ({ client, setData }: ViewBeneficiariesProps) => {
           </IonToolbar>
         </IonHeader>
         <div className="inner-content">
-          <div className="py-1">{token && canDoAction(token.role, token.permissions, 'clients', 'update') && <CreateBeneficiary client={client} setData={setData} />}</div>
+          <div className="py-1">{canDoAction(token.role, token.permissions, 'clients', 'update') && <CreateBeneficiary client={client} setData={setData} />}</div>
           {client.beneficiaries.length < 1 && <div className="text-center text-slate-700 text-sm py-3">No Beneficiary Found</div>}
           {client.beneficiaries.length > 0 && (
             <div className="relative overflow-auto">
@@ -81,7 +64,7 @@ const ViewBeneficiaries = ({ client, setData }: ViewBeneficiariesProps) => {
                   <TableHeadRow className="border-b-0 bg-slate-100">
                     <TableHead>Beneficiary Name</TableHead>
                     <TableHead>Relationship</TableHead>
-                    {token && canDoAction(token.role, token.permissions, 'clients', 'update') && <TableHead>Actions</TableHead>}
+                    {canDoAction(token.role, token.permissions, 'clients', 'update') && <TableHead>Actions</TableHead>}
                   </TableHeadRow>
                 </TableHeader>
                 <TableBody>
@@ -89,7 +72,7 @@ const ViewBeneficiaries = ({ client, setData }: ViewBeneficiariesProps) => {
                     <TableRow key={beneficiary._id} className="border-b-0 hover:!bg-transparent">
                       <TableCell className="border-4 border-slate-100">{beneficiary.name}</TableCell>
                       <TableCell className="border-4 border-slate-100">{beneficiary.relationship}</TableCell>
-                      {token && canDoAction(token.role, token.permissions, 'clients', 'update') && (
+                      {canDoAction(token.role, token.permissions, 'clients', 'update') && (
                         <TableCell className="border-4 border-slate-100">
                           <div className="flex items-center gap-2">
                             <UpdateBeneficiary beneficiary={beneficiary} setData={setData} />

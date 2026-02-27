@@ -71,8 +71,8 @@ const UpdateDamayanFund = ({ damayanFund, setData, getDamayanFunds, currentPage 
         acctYear: `${damayanFund.acctYear}`,
         checkNo: damayanFund.checkNo,
         checkDate: formatDateInput(damayanFund.checkDate),
-        bankCode: damayanFund.bank._id,
-        bankCodeLabel: `${damayanFund.bank.code}`,
+        bankCode: damayanFund.bankCode._id,
+        bankCodeLabel: `${damayanFund.bankCode.code}`,
         amount: `${formatAmount(damayanFund.amount)}`,
         mode: 'update',
         name: ''

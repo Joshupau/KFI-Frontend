@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateLoan from './modals/CreateLoan';
@@ -27,7 +27,7 @@ export type TLoan = {
 };
 
 const Loans = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -43,21 +43,6 @@ const Loans = () => {
     nextPage: false,
     prevPage: false,
   });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
 
   const getLoans = async (page: number, keyword: string = '', sort: string = '') => {
    if(online){
@@ -175,7 +160,7 @@ const Loans = () => {
 
               <div className="flex flex-col lg:flex-row items-start justify-start flex-wrap gap-2">
                 <div className=' flex flex-wrap gap-2'>
-                  {token && canDoAction(token.role, token.permissions, 'product', 'create') && <CreateLoan getLoans={getLoans} />}
+                  {canDoAction(token.role, token.permissions, 'product', 'create') && <CreateLoan getLoans={getLoans} />}
                 {!online && (
                    <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                      <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -190,7 +175,7 @@ const Loans = () => {
                     <TableHeadRow>
                       <TableHead>Code</TableHead>
                       <TableHead>Description</TableHead>
-                      {token && haveActions(token.role, 'product', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'product', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -202,7 +187,7 @@ const Loans = () => {
                         <TableRow key={loan._id}>
                           <TableCell>{loan.code}</TableCell>
                           <TableCell>{loan.description}</TableCell>
-                          {token && haveActions(token.role, 'product', token.permissions, ['update', 'delete', 'visible']) && (
+                          {haveActions(token.role, 'product', token.permissions, ['update', 'delete', 'visible']) && (
                             <TableCell>
                               <LoanActions
                                 loan={loan}

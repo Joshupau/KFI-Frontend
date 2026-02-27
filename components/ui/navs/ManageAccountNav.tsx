@@ -2,7 +2,7 @@ import { IonButton, IonIcon } from '@ionic/react';
 import classNames from 'classnames';
 import { jwtDecode } from 'jwt-decode';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { AccessToken, Permission } from '../../../types/types';
 import { isVisible } from '../../utils/permissions';
 import { manageAccountResource } from '../../utils/constants';
@@ -10,25 +10,8 @@ import { key, people } from 'ionicons/icons';
 import { UserShield01Icon, UserGroupIcon } from 'hugeicons-react';
 
 const ManageAccountNav = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
 
   return (
     isVisible(token.role, token.permissions, manageAccountResource) && (

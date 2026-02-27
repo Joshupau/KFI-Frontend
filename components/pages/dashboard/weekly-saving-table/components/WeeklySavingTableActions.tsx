@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import UpdateWeeklySavingTable from '../modals/UpdateWeeklySavingTable';
 import DeleteWeeklySavingTable from '../modals/DeleteWeeklySavingTable';
@@ -20,29 +20,12 @@ type WeeklySavingTableActionsProps = {
 };
 
 const WeeklySavingTableActions = ({ saving, setData, getWeeklySavings, currentPage, setCurrentPage, searchKey, sortKey, rowLength }: WeeklySavingTableActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   return (
     <div>
-      {token && canDoAction(token.role, token.permissions, 'weekly savings', 'update') && <UpdateWeeklySavingTable saving={saving} setData={setData} />}
-      {token && canDoAction(token.role, token.permissions, 'weekly savings', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'weekly savings', 'update') && <UpdateWeeklySavingTable saving={saving} setData={setData} />}
+      {canDoAction(token.role, token.permissions, 'weekly savings', 'delete') && (
         <DeleteWeeklySavingTable saving={saving} getWeeklySavings={getWeeklySavings} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
     </div>
@@ -52,8 +35,8 @@ const WeeklySavingTableActions = ({ saving, setData, getWeeklySavings, currentPa
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`wst-${saving._id}`} triggerAction="click" className="[--max-width:10rem]">
     //     <IonContent>
-    //       {token && canDoAction(token.role, token.permissions, 'weekly savings', 'update') && <UpdateWeeklySavingTable saving={saving} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'weekly savings', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'weekly savings', 'update') && <UpdateWeeklySavingTable saving={saving} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'weekly savings', 'delete') && (
     //         <DeleteWeeklySavingTable saving={saving} getWeeklySavings={getWeeklySavings} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
     //       )}
     //     </IonContent>

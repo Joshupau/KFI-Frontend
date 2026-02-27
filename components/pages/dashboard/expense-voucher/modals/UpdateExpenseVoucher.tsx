@@ -66,8 +66,8 @@ const UpdateExpenseVoucher = ({ expenseVoucher, setData, getExpenseVouchers, cur
         acctYear: `${expenseVoucher.acctYear}`,
         checkNo: `${expenseVoucher.checkNo}`,
         checkDate: formatDateInput(expenseVoucher.checkDate),
-        bank: expenseVoucher.bank._id,
-        bankLabel: `${expenseVoucher.bank.code}`,
+        bank: expenseVoucher.bankCode._id,
+        bankLabel: `${expenseVoucher.bankCode.code}`,
         amount: `${formatAmount(expenseVoucher.amount)}`,
         
       });

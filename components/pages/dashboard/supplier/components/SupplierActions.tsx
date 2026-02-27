@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import UpdateSupplier from '../modals/UpdateSupplier';
 import DeleteSupplier from '../modals/DeleteSupplier';
@@ -21,30 +21,13 @@ type SupplierActionsProps = {
 };
 
 const SupplierActions = ({ supplier, setData, currentPage, setCurrentPage, getSuppliers, searchKey, sortKey, rowLength }: SupplierActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   return (
     <div>
-      {token && canDoAction(token.role, token.permissions, 'business supplier', 'visible') && <ViewSupplier supplier={supplier} />}
-      {token && canDoAction(token.role, token.permissions, 'business supplier', 'update') && <UpdateSupplier supplier={supplier} setData={setData} />}
-      {token && canDoAction(token.role, token.permissions, 'business supplier', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'business supplier', 'visible') && <ViewSupplier supplier={supplier} />}
+      {canDoAction(token.role, token.permissions, 'business supplier', 'update') && <UpdateSupplier supplier={supplier} setData={setData} />}
+      {canDoAction(token.role, token.permissions, 'business supplier', 'delete') && (
         <DeleteSupplier supplier={supplier} getSuppliers={getSuppliers} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
     </div>
@@ -54,8 +37,8 @@ const SupplierActions = ({ supplier, setData, currentPage, setCurrentPage, getSu
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`supplier-${supplier._id}`} triggerAction="click" className="[--max-width:10rem]">
     //     <IonContent>
-    //       {token && canDoAction(token.role, token.permissions, 'business supplier', 'update') && <UpdateSupplier supplier={supplier} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'business supplier', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'business supplier', 'update') && <UpdateSupplier supplier={supplier} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'business supplier', 'delete') && (
     //         <DeleteSupplier supplier={supplier} getSuppliers={getSuppliers} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
     //       )}
     //     </IonContent>

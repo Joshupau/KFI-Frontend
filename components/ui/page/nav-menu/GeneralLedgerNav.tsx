@@ -1,6 +1,6 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
 import { chevronDownOutline } from 'ionicons/icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import NoChildNav from './NoChildNav';
 import { AccessToken, NavLink, Permission } from '../../../../types/types';
 import WithChildNav from './WithChildNav';
@@ -13,22 +13,7 @@ import { CollectionsBookmarkIcon  } from 'hugeicons-react';
 const GeneralLedgerNav = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   const fileLinks: NavLink[] = [
     { path: '/dashboard/audit-trail', label: 'Audit Trail', resource: 'audit trail' },
@@ -63,7 +48,7 @@ const GeneralLedgerNav = () => {
         <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
           {fileLinks.map(
             link =>
-              (token && (token.role === 'superadmin' || token.permissions.find((e: Permission) => link.resource.includes(e.resource) && e.actions.visible))) &&
+              (token.role === 'superadmin' || token.permissions.find((e: Permission) => link.resource.includes(e.resource) && e.actions.visible)) &&
               (link.children ? (
                 <WithChildNav key={link.label} label={link.label} resource={link.resource} childPaths={link.children} />
               ) : (

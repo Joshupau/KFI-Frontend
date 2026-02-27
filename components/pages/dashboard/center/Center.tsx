@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateCenter from './modals/CreateCenter';
@@ -29,7 +29,7 @@ export type TCenter = {
 };
 
 const Center = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -47,17 +47,6 @@ const Center = () => {
     prevPage: false,
   });
 
-  useEffect(() => {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      try {
-        const decoded: AccessToken = jwtDecode(authData);
-        setToken(decoded);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-      }
-    }
-  }, []);
 
   const getCenters = async (page: number, keyword: string = '', sort: string = '') => {
     if(online){
@@ -178,9 +167,9 @@ const Center = () => {
             <div className=" p-4 pb-5 bg-white rounded-xl flex-1 shadow-lg">
               <div className="flex lg:flex-row flex-col gap-3">
                 <div className="flex items-center flex-wrap gap-2">
-                  {token && canDoAction(token.role, token.permissions, 'center', 'create') && <CreateCenter getCenters={getCenters} />}
-                  {token && canDoAction(token.role, token.permissions, 'center', 'print') && <PrintAllCenter />}
-                  {token && canDoAction(token.role, token.permissions, 'center', 'export') && <ExportAllCenter />}
+                  {canDoAction(token.role, token.permissions, 'center', 'create') && <CreateCenter getCenters={getCenters} />}
+                  {canDoAction(token.role, token.permissions, 'center', 'print') && <PrintAllCenter />}
+                  {canDoAction(token.role, token.permissions, 'center', 'export') && <ExportAllCenter />}
                   {!online && (
                     <IonButton disabled={uploading} onClick={uploadCenters} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                       <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -199,7 +188,7 @@ const Center = () => {
                       <TableHead>Center Chief</TableHead>
                       <TableHead>Treasurer</TableHead>
                       <TableHead>Account Officer</TableHead>
-                      {token && haveActions(token.role, 'center', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'center', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -215,7 +204,7 @@ const Center = () => {
                           <TableCell>{center.centerChief}</TableCell>
                           <TableCell>{center.treasurer}</TableCell>
                           <TableCell>{center.acctOfficer}</TableCell>
-                          {token && haveActions(token.role, 'center', token.permissions, ['update', 'delete', 'visible']) && (
+                          {haveActions(token.role, 'center', token.permissions, ['update', 'delete', 'visible']) && (
                             <TableCell>
                               <CenterActions
                                 center={center}

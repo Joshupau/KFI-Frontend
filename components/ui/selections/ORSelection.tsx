@@ -67,14 +67,11 @@ const ORSelection = <T extends FieldValues>({
     setIsOpen(true);
   };
 
-  const handleSearch = async (page: number, dueDateOverride?: string) => {
+  const handleSearch = async (page: number) => {
     const value = ionInputRef.current?.value || '';
-    const usedDueDate = dueDateOverride ?? dueDateId;
     setData(prev => ({ ...prev, loading: true }));
     try {
-      const filter: any = { type: type };
-      if (usedDueDate) filter.dueDateId = usedDueDate;
-      else filter.dueDate = new Date().toISOString().split('T')[0];
+      const filter: any = { dueDateId: dueDateId, type: type};
       const result = await kfiAxios.get('/acknowledgement/load-entries', { params: filter });
       const { success, acknowledgements, hasPrevPage, hasNextPage, totalPages } = result.data;
       if (success) {
@@ -101,25 +98,7 @@ const ORSelection = <T extends FieldValues>({
         const result = await kfiAxios.get(`/transaction/due-dates/${center}`);
         const { success, dueDates } = result.data;
 
-        setDuedates(dueDates || [])
-
-        // default to today's due date when available
-        try {
-          const parsed = dueDates || [];
-          const todayISO = new Date().toISOString().split('T')[0];
-          const match = parsed.find((item: any) => {
-            const d = item.dueDate || item.duedate;
-            if (!d) return false;
-            const iso = new Date(d).toISOString().split('T')[0];
-            return iso === todayISO;
-          });
-          const first = parsed[0];
-          const selectedId = match ? (match._id || match.id || (match.id?.toString && match.id.toString()) || '') : (first ? (first._id || first.id || '') : '');
-          if (selectedId) {
-            setDueDateId(selectedId);
-            handleSearch(1, selectedId);
-          }
-        } catch (e) {}
+        setDuedates(dueDates)
      
       } catch (error) {
       } finally {
@@ -132,14 +111,10 @@ const ORSelection = <T extends FieldValues>({
     const code = acknowledgement.code as PathValue<T, Path<T>>;
     const id = acknowledgement._id as PathValue<T, Path<T>>;
 
-    if (acknowledgementLabel) {
-      setValue(acknowledgementLabel as Path<T>, code as any);
-      clearErrors(acknowledgementLabel);
-    }
-    if (acknowledgementValue) {
-      setValue(acknowledgementValue as Path<T>, id as any);
-      clearErrors(acknowledgementValue);
-    }
+    setValue(acknowledgementLabel as Path<T>, code as any);
+    setValue(acknowledgementValue as Path<T>, id as any);
+    clearErrors(acknowledgementLabel);
+    clearErrors(acknowledgementValue);
     setData({
       acknowledgements: [],
       loading: false,
@@ -153,7 +128,7 @@ const ORSelection = <T extends FieldValues>({
   const handlePagination = (page: number) => handleSearch(page);
 
   useEffect(() => {
-    if (isOpen) handleDueDates();
+    if (isOpen) handlePagination(1), handleDueDates();
   }, [isOpen]);
 
   return (
@@ -206,9 +181,9 @@ const ORSelection = <T extends FieldValues>({
                       '!border border-zinc-300 [--highlight-color-focused:none] !px-2 !py-1 text-xs !overflow-y-auto !max-h-[18rem] !min-h-[0.5rem] !min-w-[8rem]',
                     )}
                     >
-                      {duedates?.map((item, index) => (
-                        <IonSelectOption key={index}  value={item._id || item.id} className="text-xs [--min-height:0.5rem]">
-                          {item.duedate || item.dueDate}
+                      {duedates.map((item, index) => (
+                        <IonSelectOption key={index}  value={item.id} className="text-xs [--min-height:0.5rem]">
+                          {item.duedate}
                         </IonSelectOption>
                       ))}
                         
@@ -238,12 +213,6 @@ const ORSelection = <T extends FieldValues>({
                           </IonSelectOption>
                           <IonSelectOption  value={'individual'} className="text-xs [--min-height:0.5rem]">
                             Individual
-                          </IonSelectOption>
-                          <IonSelectOption  value={'educational'} className="text-xs [--min-height:0.5rem]">
-                            Educational
-                          </IonSelectOption>
-                          <IonSelectOption  value={'other'} className="text-xs [--min-height:0.5rem]">
-                            Other
                           </IonSelectOption>
                     </IonSelect>
                   </FormIonItem>

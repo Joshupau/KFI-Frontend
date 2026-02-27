@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { AccessToken, ClientMasterFile } from '../../../../../types/types';
 import { TClientMasterFile } from '../ClientMasterFile';
 import UpdateClientMasterFile from '../modals/UpdateClientMasterFile';
@@ -23,33 +23,16 @@ type ClientMasterFileActionsProps = {
 };
 
 const ClientMasterFileActions = ({ client, getClients, setData, currentPage, setCurrentPage, searchKey, sortKey, rowLength, getClientsOffline }: ClientMasterFileActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   return (
     <div className="flex items-center gap-1">
-      {token && canDoAction(token.role, token.permissions, 'clients', 'visible') && <ViewClientMasterFile member={client} />}
-      {token && canDoAction(token.role, token.permissions, 'clients', 'update') && <UpdateClientMasterFile getClientsOffline={getClientsOffline} client={client} setData={setData} />}
-      {token && canDoAction(token.role, token.permissions, 'clients', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'clients', 'visible') && <ViewClientMasterFile member={client} />}
+      {canDoAction(token.role, token.permissions, 'clients', 'update') && <UpdateClientMasterFile getClientsOffline={getClientsOffline} client={client} setData={setData} />}
+      {canDoAction(token.role, token.permissions, 'clients', 'delete') && (
         <DeleteClientMasterFile getClientsOffline={getClientsOffline} client={client} getClients={getClients} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
       )}
-      {token && canDoAction(token.role, token.permissions, 'clients', 'print') && <PrintClient client={client} />}
-      {token && canDoAction(token.role, token.permissions, 'clients', 'export') && <ExportClient client={client} />}
+      {canDoAction(token.role, token.permissions, 'clients', 'print') && <PrintClient client={client} />}
+      {canDoAction(token.role, token.permissions, 'clients', 'export') && <ExportClient client={client} />}
     </div>
     // <>
     //   <IonButton fill="clear" id={`cmf-${client._id}`} className="[--padding-start:0] [--padding-end:0] [--padding-top:0] [--padding-bottom:0] min-h-5">
@@ -57,19 +40,19 @@ const ClientMasterFileActions = ({ client, getClients, setData, currentPage, set
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`cmf-${client._id}`} triggerAction="click" className="[--max-width:13rem]">
     //     <IonContent>
-    //       {token && canDoAction(token.role, token.permissions, 'clients', 'update') && <UpdateClientMasterFile client={client} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'clients', 'visible') && (
+    //       {canDoAction(token.role, token.permissions, 'clients', 'update') && <UpdateClientMasterFile client={client} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'clients', 'visible') && (
     //         <>
     //           <ViewBeneficiaries client={client} setData={setData} />
     //           <ViewChildrens client={client} setData={setData} />
     //         </>
     //       )}
 
-    //       {token && canDoAction(token.role, token.permissions, 'clients', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'clients', 'delete') && (
     //         <DeleteClientMasterFile client={client} getClients={getClients} searchkey={searchKey} sortKey={sortKey} currentPage={currentPage} rowLength={rowLength} />
     //       )}
-    //       {token && canDoAction(token.role, token.permissions, 'clients', 'print') && <PrintClient client={client} />}
-    //       {token && canDoAction(token.role, token.permissions, 'clients', 'export') && <ExportClient client={client} />}
+    //       {canDoAction(token.role, token.permissions, 'clients', 'print') && <PrintClient client={client} />}
+    //       {canDoAction(token.role, token.permissions, 'clients', 'export') && <ExportClient client={client} />}
     //     </IonContent>
     //   </IonPopover>
     // </>

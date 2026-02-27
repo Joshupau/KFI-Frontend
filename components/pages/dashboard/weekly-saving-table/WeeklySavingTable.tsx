@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonPage, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateWeeklySavingTable from './modals/CreateWeeklySavingTable';
@@ -30,7 +30,7 @@ export type TWeeklySavingsTable = {
 };
 
 const WeeklySavingTable = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
 
   const [present] = useIonToast();
 
@@ -48,21 +48,6 @@ const WeeklySavingTable = () => {
     prevPage: false,
   });
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
   const getWeeklySavings = async (page: number, keyword: string = '', sort: string = '') => {
     if(online){
       setData(prev => ({ ...prev, loading: true }));
@@ -71,18 +56,15 @@ const WeeklySavingTable = () => {
       if (keyword) filter.search = keyword;
       if (sort) filter.sort = sort;
       const result = await kfiAxios.get('/weekly-saving', { params: filter });
-      const payload = result.data?.data ?? result.data;
-      const { success, weeklySavings, hasPrevPage, hasNextPage, totalPages } = payload || {};
+      const { success, weelySavings, hasPrevPage, hasNextPage, totalPages } = result.data;
       if (success) {
         setData(prev => ({
           ...prev,
-          savings: weeklySavings ?? [],
-          totalPages: totalPages ?? 0,
-          nextPage: hasNextPage ?? false,
-          prevPage: hasPrevPage ?? false,
+          savings: weelySavings,
+          totalPages: totalPages,
+          nextPage: hasNextPage,
+          prevPage: hasPrevPage,
         }));
-
-        console.log(weeklySavings)
         setCurrentPage(page);
         setSearchKey(keyword);
         setSortKey(sort);
@@ -180,8 +162,8 @@ const WeeklySavingTable = () => {
             <div className="px-3 pt-3 pb-5 bg-white rounded-xl flex-1 shadow-lg">
               <div className="flex flex-col lg:flex-row items-start justify-start gap-3 ">
                 <div className=' flex flex-wrap gap-2'>
-                  {token && canDoAction(token.role, token.permissions, 'weekly savings', 'print') && <PrintAllWeeklySavingsTable />}
-                  {token && canDoAction(token.role, token.permissions, 'weekly savings', 'export') && <ExportAllWeeklySavingsTable />}
+                  {canDoAction(token.role, token.permissions, 'weekly savings', 'print') && <PrintAllWeeklySavingsTable />}
+                  {canDoAction(token.role, token.permissions, 'weekly savings', 'export') && <ExportAllWeeklySavingsTable />}
                   {online && (
                       <IonButton disabled={uploading} onClick={uploadChanges} fill="clear" id="create-center-modal" className="max-h-10 min-h-6 bg-[#FA6C2F] text-white capitalize font-semibold rounded-md" strong>
                         <Upload size={15} className=' mr-1'/> {uploading ? 'Uploading...' : 'Upload'}
@@ -197,7 +179,7 @@ const WeeklySavingTable = () => {
                       <TableHead>Range Amount From</TableHead>
                       <TableHead>Range Amount To</TableHead>
                       <TableHead>WSF</TableHead>
-                      {token && haveActions(token.role, 'weekly savings', token.permissions, ['update', 'delete']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'weekly savings', token.permissions, ['update', 'delete']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -210,7 +192,7 @@ const WeeklySavingTable = () => {
                           <TableCell>{formatNumber(saving.rangeAmountFrom)}</TableCell>
                           <TableCell>{formatNumber(saving.rangeAmountTo)}</TableCell>
                           <TableCell>{formatNumber(saving.weeklySavingsFund)}</TableCell>
-                          {token && haveActions(token.role, 'weekly savings', token.permissions, ['update', 'delete']) && (
+                          {haveActions(token.role, 'weekly savings', token.permissions, ['update', 'delete']) && (
                             <TableCell>
                               <WeeklySavingTableActions
                                 saving={saving}

@@ -239,7 +239,7 @@ export type ExpenseVoucher = {
   acctMonth: number;
   acctYear: number;
   amount: number;
-  bank: { _id: string; code: string; description: string };
+  bankCode: { _id: string; code: string; description: string };
   // supplier: { _id: string; code: string; description: string };
   supplier: string ;
   checkDate: string;
@@ -263,7 +263,7 @@ export type Release = {
   acctOfficer: string;
   amount: number;
   cashCollectionAmount?: number;
-  bank: { _id: string; code: string; description: string };
+  bankCode: { _id: string; code: string; description: string };
   type: string;
   checkDate: string;
   checkNo: string;
@@ -288,7 +288,7 @@ export type Acknowledgement = {
   acctOfficer: string;
   amount: number;
   cashCollectionAmount?: number;
-  bank: { _id: string; code: string; description: string };
+  bankCode: { _id: string; code: string; description: string };
   type: string;
   checkDate: string;
   checkNo: string;
@@ -310,7 +310,7 @@ export type JournalVoucher = {
   acctMonth: number;
   acctYear: number;
   amount: number;
-  bank: { _id: string; code: string; description: string };
+  bankCode: { _id: string; code: string; description: string };
   nature: string;
   checkDate: string;
   checkNo: string;
@@ -341,7 +341,7 @@ export type EmergencyLoan = {
   acctYear: number;
   checkNo: string;
   checkDate: string;
-  bank: { _id: string; code: string; description: string };
+  bankCode: { _id: string; code: string; description: string };
   amount: number;
   encodedBy: { username: string };
   entries: any[];
@@ -364,7 +364,7 @@ export type DamayanFund = {
   acctYear: number;
   checkNo: string;
   checkDate: string;
-  bank: { _id: string; code: string; description: string };
+  bankCode: { _id: string; code: string; description: string };
   amount: number;
   encodedBy: { username: string };
   entries: any[];

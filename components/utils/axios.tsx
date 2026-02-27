@@ -27,10 +27,9 @@ const Response = (response: AxiosResponse): AxiosResponse => {
 };
 
 const ResponseError = async (error: AxiosError): Promise<never> => {
-  // Clear token on any 401/403 error (invalid/expired token, changed backend keys, etc.)
-  if (error.response?.status === 401 || error.response?.status === 403) {
+  if (error.response?.data === 'Unauthorized' && error.response?.status === 401) {
     localStorage.removeItem('auth');
-    window.location.href = '/';
+    window.location.reload();
   }
   return Promise.reject(error);
 };

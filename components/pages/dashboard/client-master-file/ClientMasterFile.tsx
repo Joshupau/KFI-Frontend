@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPage, IonSpinner, useIonToast, useIonViewWillEnter } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../ui/table/Table';
 import PageTitle from '../../../ui/page/PageTitle';
 import CreateClientMasterFile from './modals/CreateClientMasterFile';
@@ -33,7 +33,7 @@ export type TClientMasterFile = {
 };
 
 const ClientMasterFile = () => {
-  const [token, setToken] = useState<AccessToken | null>(null);
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   const [present] = useIonToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -54,18 +54,6 @@ const ClientMasterFile = () => {
     nextPage: false,
     prevPage: false,
   });
-
-  useEffect(() => {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      try {
-        const decoded: AccessToken = jwtDecode(authData);
-        setToken(decoded);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-      }
-    }
-  }, []);
 
   const getClientsOffline = async (
     page: number,
@@ -254,9 +242,9 @@ const ClientMasterFile = () => {
             <div className=" p-4 pb-5 bg-white rounded-xl flex-1 shadow-lg">
                <div className="flex items-start lg:items-center lg:flex-row flex-col flex-wrap gap-2 my-2">
                 <div className="flex flex-wrap">
-                  {token && canDoAction(token.role, token.permissions, 'clients', 'create') && <CreateClientMasterFile getClientsOffline={getClientsOffline} getClients={getClients} />}
-                  {token && canDoAction(token.role, token.permissions, 'clients', 'print') && <PrintAllClient />}
-                  {token && canDoAction(token.role, token.permissions, 'clients', 'export') && <ExportAllClient />}
+                  {canDoAction(token.role, token.permissions, 'clients', 'create') && <CreateClientMasterFile getClientsOffline={getClientsOffline} getClients={getClients} />}
+                  {canDoAction(token.role, token.permissions, 'clients', 'print') && <PrintAllClient />}
+                  {canDoAction(token.role, token.permissions, 'clients', 'export') && <ExportAllClient />}
                 </div>
                 <ClientMasterFileFilter getClientsOffline={getClientsOffline} getClients={getClients} />
               </div>
@@ -298,7 +286,7 @@ const ClientMasterFile = () => {
                       <TableHead className=' whitespace-nowrap'>City</TableHead>
                       <TableHead className=' whitespace-nowrap'>Zip Code</TableHead>
                       <TableHead className=' whitespace-nowrap'>Mobile No.</TableHead>
-                      {token && haveActions(token.role, 'clients', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
+                      {haveActions(token.role, 'clients', token.permissions, ['update', 'delete', 'visible']) && <TableHead>Actions</TableHead>}
                     </TableHeadRow>
                   </TableHeader>
                   <TableBody>
@@ -317,7 +305,7 @@ const ClientMasterFile = () => {
                           <TableCell>{client.city}</TableCell>
                           <TableCell>{client.zipCode}</TableCell>
                           <TableCell>{client.mobileNo}</TableCell>
-                          {token && haveActions(token.role, 'clients', token.permissions, ['update', 'delete', 'visible']) && (
+                          {haveActions(token.role, 'clients', token.permissions, ['update', 'delete', 'visible']) && (
                             <TableCell>
                               <ClientMasterFileActions
                               getClientsOffline={getClientsOffline}

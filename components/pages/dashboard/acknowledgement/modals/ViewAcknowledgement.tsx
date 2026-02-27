@@ -70,7 +70,7 @@ const ViewAcknowledgement = ({ acknowledgement }: ViewAcknowledgementProps) => {
             <div className="space-y-1">
               <AcknowledgementViewCard label="Check Number" value={acknowledgement.checkNo} labelClassName="min-w-28 text-end " />
               <AcknowledgementViewCard label="Check Date" value={formatDateTable(acknowledgement.checkDate)} labelClassName="min-w-28 text-end " />
-              <AcknowledgementViewCard label="Bank Code" value={acknowledgement.bank.code} labelClassName="min-w-28 text-end " />
+              <AcknowledgementViewCard label="Bank Code" value={acknowledgement.bankCode.code} labelClassName="min-w-28 text-end " />
               <AcknowledgementViewCard label="Amount" value={`${formatNumber(acknowledgement.amount)}`} labelClassName="min-w-28 text-end" />
               <AcknowledgementViewCard
                 label="Cash Collection"

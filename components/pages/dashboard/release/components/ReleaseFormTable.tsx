@@ -1,5 +1,5 @@
 import { IonButton, IonIcon, IonModal, useIonToast } from '@ionic/react';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableHeadRow, TableRow } from '../../../../ui/table/Table';
 import kfiAxios from '../../../../utils/axios';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
@@ -37,7 +37,6 @@ const ReleaseFormTable = ({ form }: ReleaseFormTableProps) => {
   
 
   const center = form.watch('center');
-  const arRefNo = form.watch('refNo');
 
   const { fields, replace, remove, append } = useFieldArray({
     control: form.control,
@@ -117,64 +116,40 @@ const ReleaseFormTable = ({ form }: ReleaseFormTableProps) => {
     // };
 
 
-    const handleLoadEntries = async (refNo?: string) => {
-      if (center === '') {
-        form.setError('centerLabel', { message: 'Center is required' });
-        present({ message: 'Center is required to load entries', duration: 2000 });
+    const handleLoadEntries = async () => {
+    if (center === '') {
+      form.setError('centerLabel', { message: 'Center is required' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await kfiAxios.post(`transaction/entries/load`, { centerLabel: center });
+      const { success, entries } = result.data;
+      if (success) {
+        replace(
+          entries.map((entry: EntryOption) => ({
+            loanReleaseEntryId: entry._id,
+            cvNo: `CV#${entry.cvNo}`,
+            dueDate: formatDateTable(entry.dueDate),
+            noOfWeeks: `${entry.noOfWeeks}`,
+            name: entry.name ? `${entry.name}` : '',
+            particular: `${entry.centerNo} - ${entry.name}`,
+            acctCodeId: '',
+            acctCode: '',
+            description: '',
+            debit: '0',
+            credit: '0',
+          })),
+        );
+        setDidLoad(true);
         return;
       }
-
-      try {
-        setLoading(true);
-        present({ message: `Loading entries${refNo ? ` (ref:${refNo})` : ''}...`, duration: 1500 });
-        const body: any = { centerLabel: center };
-        if (refNo) body.refNo = refNo;
-        // Call the same endpoint used by ARSelections which returns `acknowledgements`
-        const result = await kfiAxios.get(`/release/load-entries`, { params: body });
-        const { success } = result.data;
-        const source = result.data.acknowledgements ?? result.data.entries ?? [];
-        console.log('handleLoadEntries result', result.data);
-        if (success && Array.isArray(source)) {
-          replace(
-            source.map((entry: any) => {
-              const rawCv = entry.cvNo || entry.code || '';
-              const cv = rawCv && String(rawCv).startsWith('CV#') ? String(rawCv) : `CV#${rawCv}`;
-              const weeks = entry.noOfWeeks ?? entry.week ?? '';
-              const name = entry.name ?? entry.clientName ?? '';
-              const particular = `${entry.centerNo ?? ''}${entry.centerNo && name ? ' - ' : ''}${name}`;
-              return {
-                loanReleaseEntryId: entry.loanReleaseId || entry._id || '',
-                cvNo: cv,
-                dueDate: formatDateTable(entry.dueDate),
-                noOfWeeks: `${weeks}`,
-                name: `${name}`,
-                particular: particular,
-                acctCodeId: entry.acctCodeId || entry.acctCodeId || '',
-                acctCode: entry.acctCode || entry.acctCode || '',
-                description: entry.acctCodeDesc || '' ,
-                debit: String(entry.debit ?? 0),
-                credit: String(entry.credit ?? 0),
-              };
-            }),
-          );
-          setDidLoad(true);
-          present({ message: `Loaded ${source.length} entries`, duration: 2000 });
-          return;
-        }
-        present({ message: 'No entries found', duration: 2000 });
-      } catch (error) {
-        present({ message: 'Failed to load entries', duration: 2000 });
-      } finally {
-        setLoading(false);
-      }
-  };
-
-  useEffect(() => {
-    if (arRefNo) {
-      handleLoadEntries(arRefNo);
+    } catch (error) {
+    } finally {
+      setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arRefNo]);
+  };
 
   const handleAddEntry = () =>
     append({ loanReleaseEntryId: '', dueDate: '', noOfWeeks: '', name: '', particular: '', acctCodeId: '', acctCode: '', description: '', debit: '0', credit: '0' });
@@ -201,13 +176,7 @@ const ReleaseFormTable = ({ form }: ReleaseFormTableProps) => {
           {loading ? 'Loading Entries...' : 'Load Entries'}
         </IonButton> */}
 
-        <ARSelection
-          clearErrors={form.clearErrors}
-          setValue={form.setValue}
-          center={center}
-          acknowledgementLabel={"code"}
-          acknowledgementValue={"refNo"}
-        />
+        <ARSelection clearErrors={form.clearErrors} setValue={form.setValue} center={center}/>
 
         {/* <IonButton
                           disabled={loading || center === '' || didLoad}
@@ -330,7 +299,7 @@ const ReleaseFormTable = ({ form }: ReleaseFormTableProps) => {
                 
                                     <IonButton
                                     disabled={selectedIds.length === 0}
-                                      onClick={() => handleLoadEntries()}
+                                      onClick={handleLoadEntries}
                                       type="button"
                                       fill="clear"
                                       className="max-h-10 min-h-6 bg-[#FA6C2F] w-40 text-white capitalize font-semibold rounded-md"

@@ -1,6 +1,6 @@
 import { IonContent, IonIcon, IonPopover } from '@ionic/react';
 import { chevronForwardOutline } from 'ionicons/icons';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import NoChildNav from './NoChildNav';
 import classNames from 'classnames';
 import { AccessToken, Permission } from '../../../../types/types';
@@ -13,25 +13,7 @@ type WithChildNavProps = {
 };
 
 const WithChildNav = ({ label, resource, childPaths }: WithChildNavProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const authToken = localStorage.getItem('auth');
-        if (authToken) {
-          const decoded: AccessToken = jwtDecode(authToken);
-          setToken(decoded);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('auth');
-      }
-    }
-  }, []);
-
-  if (!token) return null;
-
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   return (
     <div>
       <div
@@ -48,7 +30,7 @@ const WithChildNav = ({ label, resource, childPaths }: WithChildNavProps) => {
         <IonContent class="[--padding-top:0.5rem] [--padding-bottom:0.5rem]">
           {childPaths.map(
             child =>
-              (token && (token.role === 'superadmin' || token.permissions.find((e: Permission) => e.resource === child.resource && e.actions.visible))) && (
+              (token.role === 'superadmin' || token.permissions.find((e: Permission) => e.resource === child.resource && e.actions.visible)) && (
                 <NoChildNav key={child.path} label={child.label} path={child.path} resource={child.resource} />
               ),
           )}

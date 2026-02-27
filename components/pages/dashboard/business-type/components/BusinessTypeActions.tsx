@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPopover } from '@ionic/react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ellipsisVertical } from 'ionicons/icons';
 import UpdateBusinessType from '../modals/UpdateBusinessType';
 import DeleteBusinessType from '../modals/DeleteBusinessType';
@@ -21,27 +21,12 @@ type BusinessTypeActionsProps = {
 };
 
 const BusinessTypeActions = ({ businessType, setData, currentPage, setCurrentPage, getBusinessTypes, searchKey, sortKey, rowLength }: BusinessTypeActionsProps) => {
-  const [token, setToken] = useState<AccessToken | null>(null);
-
-  useEffect(() => {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      try {
-        const decoded: AccessToken = jwtDecode(authData);
-        setToken(decoded);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-      }
-    }
-  }, []);
-
-  if (!token) return null;
-
+  const token: AccessToken = jwtDecode(localStorage.getItem('auth') as string);
   return (
     <div>
-      {token && canDoAction(token.role, token.permissions, 'business type', 'visible') && <ViewBusinessType businessType={businessType} />}
-      {token && canDoAction(token.role, token.permissions, 'business type', 'update') && <UpdateBusinessType businessType={businessType} setData={setData} />}
-      {token && canDoAction(token.role, token.permissions, 'business type', 'delete') && (
+      {canDoAction(token.role, token.permissions, 'business type', 'visible') && <ViewBusinessType businessType={businessType} />}
+      {canDoAction(token.role, token.permissions, 'business type', 'update') && <UpdateBusinessType businessType={businessType} setData={setData} />}
+      {canDoAction(token.role, token.permissions, 'business type', 'delete') && (
         <DeleteBusinessType
           businessType={businessType}
           getBusinessTypes={getBusinessTypes}
@@ -58,8 +43,8 @@ const BusinessTypeActions = ({ businessType, setData, currentPage, setCurrentPag
     //   </IonButton>
     //   <IonPopover showBackdrop={false} trigger={`bt-${businessType._id}`} triggerAction="click" className="[--max-width:10rem]">
     //     <IonContent>
-    //       {token && canDoAction(token.role, token.permissions, 'business type', 'update') && <UpdateBusinessType businessType={businessType} setData={setData} />}
-    //       {token && canDoAction(token.role, token.permissions, 'business type', 'delete') && (
+    //       {canDoAction(token.role, token.permissions, 'business type', 'update') && <UpdateBusinessType businessType={businessType} setData={setData} />}
+    //       {canDoAction(token.role, token.permissions, 'business type', 'delete') && (
     //         <DeleteBusinessType
     //           businessType={businessType}
     //           getBusinessTypes={getBusinessTypes}
