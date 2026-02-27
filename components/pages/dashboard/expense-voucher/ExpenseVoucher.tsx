@@ -212,7 +212,7 @@ const ExpenseVoucher = () => {
                         <TableRow key={expenseVoucher._id}>
                           <TableCell>{expenseVoucher.code}</TableCell>
                           <TableCell>{formatDateTable(expenseVoucher.date)}</TableCell>
-                          <TableCell>{expenseVoucher.bankCode.description}</TableCell>
+                          <TableCell>{expenseVoucher.bank.description}</TableCell>
                           <TableCell>{expenseVoucher.checkNo}</TableCell>
                           <TableCell>{formatNumber(expenseVoucher.amount)}</TableCell>
                           <TableCell>{expenseVoucher.encodedBy.username}</TableCell>

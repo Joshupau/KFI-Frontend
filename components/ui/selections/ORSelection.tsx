@@ -214,6 +214,12 @@ const ORSelection = <T extends FieldValues>({
                           <IonSelectOption  value={'individual'} className="text-xs [--min-height:0.5rem]">
                             Individual
                           </IonSelectOption>
+                          <IonSelectOption  value={'educational'} className="text-xs [--min-height:0.5rem]">
+                            Educational
+                          </IonSelectOption>
+                          <IonSelectOption  value={'other'} className="text-xs [--min-height:0.5rem]">
+                            Other
+                          </IonSelectOption>
                     </IonSelect>
                   </FormIonItem>
 

@@ -210,7 +210,7 @@ const EmergencyLoan = () => {
                         <TableRow key={emergencyLoan._id}>
                           <TableCell>{emergencyLoan.code}</TableCell>
                           <TableCell>{formatDateTable(emergencyLoan.date)}</TableCell>
-                          <TableCell>{emergencyLoan.bankCode.description}</TableCell>
+                          <TableCell>{emergencyLoan.bank.description}</TableCell>
                           <TableCell>{emergencyLoan.checkNo}</TableCell>
                           <TableCell>{formatMoney(emergencyLoan.amount)}</TableCell>
                           <TableCell>{emergencyLoan.encodedBy?.username}</TableCell>

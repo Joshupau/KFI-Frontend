@@ -175,7 +175,7 @@ const Release = () => {
                         <TableRow key={release._id}>
                           <TableCell>{release.code}</TableCell>
                           <TableCell>{formatDateTable(release.date)}</TableCell>
-                          <TableCell>{release.bankCode.description}</TableCell>
+                          <TableCell>{release.bank.description}</TableCell>
                           <TableCell>{release.checkNo}</TableCell>
                           <TableCell>{formatMoney(release.amount)}</TableCell>
                           <TableCell>{release.encodedBy.username}</TableCell>

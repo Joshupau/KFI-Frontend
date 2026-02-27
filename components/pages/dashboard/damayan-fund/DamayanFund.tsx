@@ -214,7 +214,7 @@ const DamayanFund = () => {
                         <TableRow key={damayanFund._id}>
                           <TableCell>{damayanFund.code}</TableCell>
                           <TableCell>{formatDateTable(damayanFund.date)}</TableCell>
-                          <TableCell>{damayanFund.bankCode.description}</TableCell>
+                          <TableCell>{damayanFund.bank.description}</TableCell>
                           <TableCell>{damayanFund.checkNo}</TableCell>
                           <TableCell>{formatMoney(damayanFund.amount)}</TableCell>
                           <TableCell>{damayanFund.encodedBy.username}</TableCell>

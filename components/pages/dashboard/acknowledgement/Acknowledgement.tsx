@@ -207,7 +207,7 @@ const Acknowledgement = () => {
                         <TableRow key={acknowledgement._id}>
                           <TableCell>{acknowledgement.code}</TableCell>
                           <TableCell>{formatDateTable(acknowledgement.date)}</TableCell>
-                          <TableCell>{acknowledgement.bankCode.description}</TableCell>
+                          <TableCell>{acknowledgement.bank.description}</TableCell>
                           <TableCell>{acknowledgement.checkNo}</TableCell>
                           <TableCell>{formatMoney(acknowledgement.amount)}</TableCell>
                           <TableCell>{acknowledgement.encodedBy.username}</TableCell>
